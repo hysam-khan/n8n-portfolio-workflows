@@ -1,0 +1,326 @@
+{
+  "name": "AI Content Repurposing Factory (Blog → LinkedIn / X / Instagram)",
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "nodes": [
+    {
+      "id": "c1b2c3d4-0001-4c03-9003-000000000001",
+      "name": "Sticky Note — Source",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-420, -240],
+      "parameters": {
+        "content": "## 📰 1. Content Source\nWatches your blog's RSS feed. Every new article automatically kicks off the repurposing pipeline. (Swap for a YouTube channel, Notion DB, or manual form.)",
+        "height": 420,
+        "width": 640,
+        "color": 4
+      }
+    },
+    {
+      "id": "c1b2c3d4-0002-4c03-9003-000000000002",
+      "name": "New Blog Post (RSS)",
+      "type": "n8n-nodes-base.rssFeedReadTrigger",
+      "typeVersion": 1,
+      "position": [-320, -40],
+      "parameters": {
+        "feedUrl": "https://your-blog.com/rss.xml",
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyHour"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "c1b2c3d4-0003-4c03-9003-000000000003",
+      "name": "Clean Article Text",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-40, -40],
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\nconst html = item['content:encoded'] ?? item.content ?? item.contentSnippet ?? '';\nconst text = String(html)\n  .replace(/<style[\\s\\S]*?<\\/style>/gi, '')\n  .replace(/<script[\\s\\S]*?<\\/script>/gi, '')\n  .replace(/<[^>]+>/g, ' ')\n  .replace(/\\s+/g, ' ')\n  .trim();\nreturn [{ json: {\n  title: item.title,\n  link: item.link,\n  published: item.pubDate ?? item.isoDate,\n  article_text: text.slice(0, 12000),\n} }];"
+      }
+    },
+    {
+      "id": "c1b2c3d4-0004-4c03-9003-000000000004",
+      "name": "Sticky Note — AI Writers",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [280, -420],
+      "parameters": {
+        "content": "## ✍️ 2. Parallel AI Writers\nOne article becomes three platform-native posts at once — each prompt is tuned to the platform's voice, format, and length. One shared GPT model powers all three writers.",
+        "height": 940,
+        "width": 640,
+        "color": 6
+      }
+    },
+    {
+      "id": "c1b2c3d4-0005-4c03-9003-000000000005",
+      "name": "Write LinkedIn Post",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.4,
+      "position": [400, -280],
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a LinkedIn ghostwriter for a tech founder. Turn this article into a high-engagement LinkedIn post.\n\nRules:\n- Strong 1-line hook\n- Short punchy lines, generous whitespace\n- One concrete takeaway or list\n- End with a question to drive comments\n- 150-250 words, max 3 relevant hashtags\n- Output ONLY the post text\n\nArticle title: {{ $json.title }}\nArticle: {{ $json.article_text }}"
+      }
+    },
+    {
+      "id": "c1b2c3d4-0006-4c03-9003-000000000006",
+      "name": "Write X Thread",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.4,
+      "position": [400, 0],
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a viral X (Twitter) writer. Turn this article into a 5-7 tweet thread.\n\nRules:\n- Tweet 1 is a scroll-stopping hook (no hashtags)\n- Each tweet under 280 characters\n- Number tweets like 1/, 2/, ...\n- Last tweet links to the article: {{ $json.link }}\n- Output ONLY the thread, tweets separated by a blank line\n\nArticle title: {{ $json.title }}\nArticle: {{ $json.article_text }}"
+      }
+    },
+    {
+      "id": "c1b2c3d4-0007-4c03-9003-000000000007",
+      "name": "Write Instagram Caption",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.4,
+      "position": [400, 280],
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an Instagram content strategist. Turn this article into an Instagram caption plus a carousel outline.\n\nRules:\n- Casual, energetic tone with tasteful emojis\n- Caption: 80-120 words ending with a CTA\n- Then a 5-slide carousel outline (one line per slide)\n- 5 niche hashtags at the end\n- Output ONLY the caption and outline\n\nArticle title: {{ $json.title }}\nArticle: {{ $json.article_text }}"
+      }
+    },
+    {
+      "id": "c1b2c3d4-0008-4c03-9003-000000000008",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [520, 460],
+      "parameters": {
+        "model": "gpt-4o",
+        "options": {
+          "temperature": 0.7
+        }
+      }
+    },
+    {
+      "id": "c1b2c3d4-0009-4c03-9003-000000000009",
+      "name": "Merge Drafts",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [820, 0],
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "numberInputs": 3,
+        "options": {}
+      }
+    },
+    {
+      "id": "c1b2c3d4-0010-4c03-9003-000000000010",
+      "name": "Assemble Content Package",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1060, 0],
+      "parameters": {
+        "jsCode": "const inputs = $input.all();\nconst source = $('Clean Article Text').first().json;\nconst texts = inputs.map(i => i.json.text ?? i.json.response ?? '');\nreturn [{ json: {\n  article_title: source.title,\n  article_link: source.link,\n  linkedin_post: texts[0] ?? '',\n  x_thread: texts[1] ?? '',\n  instagram_caption: texts[2] ?? '',\n  status: 'PENDING APPROVAL',\n  generated_at: new Date().toISOString(),\n} }];"
+      }
+    },
+    {
+      "id": "c1b2c3d4-0011-4c03-9003-000000000011",
+      "name": "Sticky Note — Distribution",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [1000, -420],
+      "parameters": {
+        "content": "## 🚀 3. Review & Distribution\nEvery content package lands in the Google Sheets content calendar, is archived to Notion, and the team gets a Slack ping to approve before publishing.",
+        "height": 380,
+        "width": 900,
+        "color": 3
+      }
+    },
+    {
+      "id": "c1b2c3d4-0012-4c03-9003-000000000012",
+      "name": "Save to Content Calendar",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [1340, -160],
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": []
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "c1b2c3d4-0013-4c03-9003-000000000013",
+      "name": "Archive to Notion",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [1340, 60],
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "create",
+        "databaseId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "title": "={{ $json.article_title }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "c1b2c3d4-0014-4c03-9003-000000000014",
+      "name": "Slack — Ready for Review",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [1340, 280],
+      "webhookId": "slack-content-review",
+      "parameters": {
+        "resource": "message",
+        "operation": "post",
+        "select": "channel",
+        "text": "=📦 *New content package ready for review!*\n📰 Article: {{ $json.article_title }}\n🔗 {{ $json.article_link }}\n\nDrafts for LinkedIn, X and Instagram are in the content calendar. React ✅ to approve.",
+        "otherOptions": {}
+      }
+    }
+  ],
+  "connections": {
+    "New Blog Post (RSS)": {
+      "main": [
+        [
+          {
+            "node": "Clean Article Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean Article Text": {
+      "main": [
+        [
+          {
+            "node": "Write LinkedIn Post",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Write X Thread",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Write Instagram Caption",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write LinkedIn Post": {
+      "main": [
+        [
+          {
+            "node": "Merge Drafts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write X Thread": {
+      "main": [
+        [
+          {
+            "node": "Merge Drafts",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Write Instagram Caption": {
+      "main": [
+        [
+          {
+            "node": "Merge Drafts",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Write LinkedIn Post",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Write X Thread",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Write Instagram Caption",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Drafts": {
+      "main": [
+        [
+          {
+            "node": "Assemble Content Package",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assemble Content Package": {
+      "main": [
+        [
+          {
+            "node": "Save to Content Calendar",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Archive to Notion",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Slack — Ready for Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "tags": []
+}

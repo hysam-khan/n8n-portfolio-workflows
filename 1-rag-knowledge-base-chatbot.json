@@ -1,0 +1,258 @@
+{
+  "name": "RAG Knowledge Base Chatbot (Docs → Vector Store → AI Agent)",
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "nodes": [
+    {
+      "id": "a1b2c3d4-0001-4a01-9001-000000000001",
+      "name": "Sticky Note — Ingestion",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-380, -260],
+      "parameters": {
+        "content": "## 📚 1. Document Ingestion Pipeline\nUpload any PDF / DOCX / TXT via the form.\nThe file is split into chunks, embedded with OpenAI, and stored in the vector database.\n\n**Swap the Simple Vector Store for Pinecone / Qdrant / Supabase in production.**",
+        "height": 500,
+        "width": 900,
+        "color": 4
+      }
+    },
+    {
+      "id": "a1b2c3d4-0002-4a01-9001-000000000002",
+      "name": "Upload Documents",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.1,
+      "position": [-260, -60],
+      "webhookId": "rag-upload-form",
+      "parameters": {
+        "formTitle": "Knowledge Base Uploader",
+        "formDescription": "Upload documents to teach the AI assistant.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Document",
+              "fieldType": "file",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "a1b2c3d4-0003-4a01-9001-000000000003",
+      "name": "Insert into Vector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
+      "typeVersion": 1.1,
+      "position": [120, -60],
+      "parameters": {
+        "mode": "insert",
+        "memoryKey": "portfolio_knowledge_base"
+      }
+    },
+    {
+      "id": "a1b2c3d4-0004-4a01-9001-000000000004",
+      "name": "Default Data Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1,
+      "position": [240, 120],
+      "parameters": {
+        "dataType": "binary",
+        "options": {}
+      }
+    },
+    {
+      "id": "a1b2c3d4-0005-4a01-9001-000000000005",
+      "name": "Recursive Text Splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [360, 300],
+      "parameters": {
+        "chunkSize": 1000,
+        "chunkOverlap": 120,
+        "options": {}
+      }
+    },
+    {
+      "id": "a1b2c3d4-0006-4a01-9001-000000000006",
+      "name": "OpenAI Embeddings",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.1,
+      "position": [40, 300],
+      "parameters": {
+        "options": {}
+      }
+    },
+    {
+      "id": "a1b2c3d4-0007-4a01-9001-000000000007",
+      "name": "Sticky Note — Chat",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-380, 560],
+      "parameters": {
+        "content": "## 💬 2. RAG Chat Agent\nUsers chat with the assistant. The agent retrieves the most relevant chunks from the vector store and answers **only from your documents**, with conversation memory.",
+        "height": 560,
+        "width": 1060,
+        "color": 5
+      }
+    },
+    {
+      "id": "a1b2c3d4-0008-4a01-9001-000000000008",
+      "name": "When Chat Message Received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [-260, 720],
+      "webhookId": "rag-chat-trigger",
+      "parameters": {
+        "options": {}
+      }
+    },
+    {
+      "id": "a1b2c3d4-0009-4a01-9001-000000000009",
+      "name": "RAG AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [120, 720],
+      "parameters": {
+        "options": {
+          "systemMessage": "You are a helpful company knowledge-base assistant. ALWAYS use the knowledge_base tool to retrieve relevant context before answering. Answer only from retrieved documents. If the answer is not in the knowledge base, say you don't know and suggest contacting support. Cite the source document name when possible."
+        }
+      }
+    },
+    {
+      "id": "a1b2c3d4-0010-4a01-9001-000000000010",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [-40, 940],
+      "parameters": {
+        "model": "gpt-4o-mini",
+        "options": {
+          "temperature": 0.2
+        }
+      }
+    },
+    {
+      "id": "a1b2c3d4-0011-4a01-9001-000000000011",
+      "name": "Conversation Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.2,
+      "position": [180, 940],
+      "parameters": {
+        "contextWindowLength": 10
+      }
+    },
+    {
+      "id": "a1b2c3d4-0012-4a01-9001-000000000012",
+      "name": "Knowledge Base Retriever",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
+      "typeVersion": 1.1,
+      "position": [400, 940],
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolName": "knowledge_base",
+        "toolDescription": "Searches the company knowledge base of uploaded documents. Use this for every user question to find relevant context.",
+        "memoryKey": "portfolio_knowledge_base",
+        "topK": 4
+      }
+    }
+  ],
+  "connections": {
+    "Upload Documents": {
+      "main": [
+        [
+          {
+            "node": "Insert into Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Insert into Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Embeddings": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Insert into Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          },
+          {
+            "node": "Knowledge Base Retriever",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Chat Message Received": {
+      "main": [
+        [
+          {
+            "node": "RAG AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "RAG AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Conversation Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "RAG AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Knowledge Base Retriever": {
+      "ai_tool": [
+        [
+          {
+            "node": "RAG AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "tags": []
+}

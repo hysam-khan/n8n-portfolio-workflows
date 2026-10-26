@@ -1,0 +1,348 @@
+{
+  "name": "AI Lead Qualification & CRM Automation (Form → Enrich → Score → Route)",
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "nodes": [
+    {
+      "id": "b1b2c3d4-0001-4b02-9002-000000000001",
+      "name": "Sticky Note — Capture",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-400, -240],
+      "parameters": {
+        "content": "## 🎯 1. Lead Capture & Enrichment\nA lead submits the form → the company domain is enriched via an API (Clearbit / Apollo / Hunter) so the AI has firmographic context.",
+        "height": 440,
+        "width": 720,
+        "color": 4
+      }
+    },
+    {
+      "id": "b1b2c3d4-0002-4b02-9002-000000000002",
+      "name": "New Lead Form",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.1,
+      "position": [-300, -40],
+      "webhookId": "lead-capture-form",
+      "parameters": {
+        "formTitle": "Contact Sales",
+        "formDescription": "Tell us about your project and we'll get back to you within 24 hours.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Full Name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Work Email",
+              "fieldType": "email",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Company Website",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Project Description",
+              "fieldType": "textarea",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Budget",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  { "option": "Under $1,000" },
+                  { "option": "$1,000 – $5,000" },
+                  { "option": "$5,000 – $20,000" },
+                  { "option": "$20,000+" }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "b1b2c3d4-0003-4b02-9002-000000000003",
+      "name": "Enrich Company Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [60, -40],
+      "parameters": {
+        "url": "=https://company.clearbit.com/v2/companies/find?domain={{ $json['Company Website'] }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "b1b2c3d4-0004-4b02-9002-000000000004",
+      "name": "Sticky Note — Scoring",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [380, -240],
+      "parameters": {
+        "content": "## 🤖 2. AI Lead Scoring\nGPT analyses the lead's message, budget and company data, then returns a JSON score (1–10) with reasoning and a suggested next action.",
+        "height": 560,
+        "width": 620,
+        "color": 6
+      }
+    },
+    {
+      "id": "b1b2c3d4-0005-4b02-9002-000000000005",
+      "name": "AI Lead Scoring",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.4,
+      "position": [480, -40],
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a senior SDR. Score this inbound lead from 1-10 for sales-readiness.\n\nLead details:\nName: {{ $('New Lead Form').item.json['Full Name'] }}\nEmail: {{ $('New Lead Form').item.json['Work Email'] }}\nCompany: {{ $('New Lead Form').item.json['Company Website'] }}\nBudget: {{ $('New Lead Form').item.json['Budget'] }}\nProject description: {{ $('New Lead Form').item.json['Project Description'] }}\n\nEnrichment data (may be empty): {{ JSON.stringify($json) }}\n\nRespond with ONLY valid JSON in this exact shape:\n{\"score\": <1-10>, \"reasoning\": \"<one sentence>\", \"suggested_action\": \"<one sentence>\", \"personalized_opening_line\": \"<one friendly sentence referencing their project>\"}"
+      }
+    },
+    {
+      "id": "b1b2c3d4-0006-4b02-9002-000000000006",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [560, 180],
+      "parameters": {
+        "model": "gpt-4o-mini",
+        "options": {
+          "temperature": 0.1
+        }
+      }
+    },
+    {
+      "id": "b1b2c3d4-0007-4b02-9002-000000000007",
+      "name": "Parse AI Score",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [860, -40],
+      "parameters": {
+        "jsCode": "const raw = $input.first().json.text ?? $input.first().json.response ?? '';\nconst match = String(raw).match(/\\{[\\s\\S]*\\}/);\nlet parsed = { score: 0, reasoning: 'Could not parse AI output', suggested_action: 'Review manually', personalized_opening_line: '' };\nif (match) {\n  try { parsed = JSON.parse(match[0]); } catch (e) {}\n}\nconst lead = $('New Lead Form').first().json;\nreturn [{ json: {\n  name: lead['Full Name'],\n  email: lead['Work Email'],\n  company: lead['Company Website'],\n  budget: lead['Budget'],\n  message: lead['Project Description'],\n  score: Number(parsed.score) || 0,\n  reasoning: parsed.reasoning,\n  suggested_action: parsed.suggested_action,\n  opening_line: parsed.personalized_opening_line,\n  received_at: new Date().toISOString(),\n} }];"
+      }
+    },
+    {
+      "id": "b1b2c3d4-0008-4b02-9002-000000000008",
+      "name": "Create Contact in HubSpot",
+      "type": "n8n-nodes-base.hubspot",
+      "typeVersion": 2.1,
+      "position": [1140, -40],
+      "parameters": {
+        "resource": "contact",
+        "operation": "upsert",
+        "email": "={{ $json.email }}",
+        "additionalFields": {
+          "firstName": "={{ $json.name }}",
+          "companyName": "={{ $json.company }}"
+        }
+      }
+    },
+    {
+      "id": "b1b2c3d4-0009-4b02-9002-000000000009",
+      "name": "Sticky Note — Routing",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [1060, -240],
+      "parameters": {
+        "content": "## 🔀 3. Smart Routing\n**Score ≥ 7 (Hot):** instant Slack alert to sales + AI-personalized follow-up email.\n**Score < 7 (Nurture):** logged to the nurture sheet for the drip campaign.",
+        "height": 660,
+        "width": 900,
+        "color": 3
+      }
+    },
+    {
+      "id": "b1b2c3d4-0010-4b02-9002-000000000010",
+      "name": "Hot Lead?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [1420, -40],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "score-check",
+              "leftValue": "={{ $json.score }}",
+              "rightValue": 7,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "b1b2c3d4-0011-4b02-9002-000000000011",
+      "name": "Alert Sales on Slack",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.2,
+      "position": [1720, -160],
+      "webhookId": "slack-hot-lead",
+      "parameters": {
+        "resource": "message",
+        "operation": "post",
+        "select": "channel",
+        "text": "=🔥 *HOT LEAD ({{ $json.score }}/10)* — {{ $json.name }} from {{ $json.company }}\n💰 Budget: {{ $json.budget }}\n🧠 {{ $json.reasoning }}\n👉 {{ $json.suggested_action }}",
+        "otherOptions": {}
+      }
+    },
+    {
+      "id": "b1b2c3d4-0012-4b02-9002-000000000012",
+      "name": "Send Personalized Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [1960, -160],
+      "webhookId": "gmail-hot-lead",
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "sendTo": "={{ $json.email }}",
+        "subject": "=Re: your project — quick question, {{ $json.name.split(' ')[0] }}",
+        "message": "={{ $json.opening_line }}\n\nThanks for reaching out! I'd love to jump on a quick 15-minute call this week to discuss the details.\n\nYou can grab a slot here: https://calendly.com/your-link\n\nBest,\nYour Name",
+        "options": {}
+      }
+    },
+    {
+      "id": "b1b2c3d4-0013-4b02-9002-000000000013",
+      "name": "Add to Nurture Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [1720, 120],
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": []
+        },
+        "options": {}
+      }
+    }
+  ],
+  "connections": {
+    "New Lead Form": {
+      "main": [
+        [
+          {
+            "node": "Enrich Company Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enrich Company Data": {
+      "main": [
+        [
+          {
+            "node": "AI Lead Scoring",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Lead Scoring": {
+      "main": [
+        [
+          {
+            "node": "Parse AI Score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Lead Scoring",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse AI Score": {
+      "main": [
+        [
+          {
+            "node": "Create Contact in HubSpot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Contact in HubSpot": {
+      "main": [
+        [
+          {
+            "node": "Hot Lead?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Hot Lead?": {
+      "main": [
+        [
+          {
+            "node": "Alert Sales on Slack",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Add to Nurture Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Alert Sales on Slack": {
+      "main": [
+        [
+          {
+            "node": "Send Personalized Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "tags": []
+}
