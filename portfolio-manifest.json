@@ -1,0 +1,37 @@
+[
+  {
+    "id": "OrderCmdCenter01",
+    "name": "Order Command Center",
+    "file": "OrderCmdCenter01.json",
+    "nodes": 24,
+    "description": "Local order desk: validate, score fraud and margin, then route quarantine, rejection, review, backorder, parcel, and pickup. Sample data only."
+  },
+  {
+    "id": "RevReconcile0001",
+    "name": "Revenue Reconciliation and Leak Audit",
+    "file": "RevReconcile0001.json",
+    "nodes": 17,
+    "description": "Match a local invoice book to payments, refunds, and chargebacks. Age the open items and separate leaks, collections, overpayments, and cleared cash."
+  },
+  {
+    "id": "SupportDesk00001",
+    "name": "Support Command Desk",
+    "file": "SupportDesk00001.json",
+    "nodes": 12,
+    "description": "Classify a local ticket queue by intent, sentiment, SLA risk, and legal language, then write an escalation, a priority packet, or an auto-reply."
+  },
+  {
+    "id": "ContentOpsFactory1",
+    "name": "Content Operations Factory",
+    "file": "ContentOpsFactory1.json",
+    "nodes": 14,
+    "description": "Turn a local brief list into a compliance hold, a revision, or an approved pack with a social cut, a newsletter cut, and a calendar slot."
+  },
+  {
+    "id": "IncidentCommand01",
+    "name": "Incident Command and Postmortem",
+    "file": "IncidentCommand01.json",
+    "nodes": 13,
+    "description": "Correlate a local alert stream into incidents, open a bridge for severity 1, draft a status note for customer-facing issues, and file internal noise."
+  }
+]

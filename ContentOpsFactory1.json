@@ -1,0 +1,367 @@
+{
+  "id": "ContentOpsFactory1",
+  "name": "Content Operations Factory",
+  "description": "Turn a local brief list into a compliance hold, a revision, or an approved pack with a social cut, a newsletter cut, and a calendar slot.",
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "nodes": [
+    {
+      "id": "ab8fe6b8-1ede-429b-8608-e179e78a236a",
+      "name": "## Briefs",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        -250
+      ],
+      "parameters": {
+        "content": "## Briefs\nRisk flags are claims the brand will not publish: guaranteed outcomes, risk-free money, and medical claims. They are sample briefs, not live campaigns.",
+        "height": 210,
+        "width": 780,
+        "color": 2
+      }
+    },
+    {
+      "id": "4a5f7094-cbf5-42f8-a851-2adbc20b1c83",
+      "name": "## Factory",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        980,
+        -250
+      ],
+      "parameters": {
+        "content": "## Factory\nHeld briefs stop. Weak brand scores go back to the writer. Approved briefs leave with a social cut, a newsletter cut, and a weekday slot.",
+        "height": 210,
+        "width": 780,
+        "color": 4
+      }
+    },
+    {
+      "id": "ece348ca-d92b-4d22-a894-2b38be77390d",
+      "name": "Run Content Factory",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        220
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "0858d409-aaad-4024-96e3-86c2d30b9cd2",
+      "name": "Load Briefs",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        320,
+        220
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const briefs = [{\"id\": \"B-01\", \"topic\": \"How a local kiln schedules a backorder\", \"channel\": \"blog\", \"words\": 1200, \"brand_score\": 9, \"risk\": 0, \"owner\": \"editorial\", \"title\": \"How a local kiln schedules a backorder\"}, {\"id\": \"B-02\", \"topic\": \"What a same-day pickup bin looks like\", \"channel\": \"newsletter\", \"words\": 700, \"brand_score\": 8, \"risk\": 0, \"owner\": \"editorial\", \"title\": \"What a same-day pickup bin looks like\"}, {\"id\": \"B-03\", \"topic\": \"A week of parcel rate shopping\", \"channel\": \"blog\", \"words\": 1000, \"brand_score\": 8, \"risk\": 0, \"owner\": \"editorial\", \"title\": \"A week of parcel rate shopping\"}, {\"id\": \"B-04\", \"topic\": \"Guaranteed cure for late shipments\", \"channel\": \"blog\", \"words\": 500, \"brand_score\": 6, \"risk\": 1, \"owner\": \"editorial\", \"title\": \"Guaranteed cure for late shipments\"}, {\"id\": \"B-05\", \"topic\": \"Double your revenue with this ledger trick\", \"channel\": \"blog\", \"words\": 400, \"brand_score\": 5, \"risk\": 1, \"owner\": \"editorial\", \"title\": \"Double your revenue with this ledger trick\"}, {\"id\": \"B-06\", \"topic\": \"Risk-free returns and zero effort growth\", \"channel\": \"blog\", \"words\": 350, \"brand_score\": 4, \"risk\": 1, \"owner\": \"editorial\", \"title\": \"Risk-free returns and zero effort growth\"}, {\"id\": \"B-07\", \"topic\": \"Why the gold tier exists\", \"channel\": \"blog\", \"words\": 800, \"brand_score\": 9, \"risk\": 0, \"owner\": \"editorial\", \"title\": \"Why the gold tier exists\"}, {\"id\": \"B-08\", \"topic\": \"Invoice aging in plain language\", \"channel\": \"blog\", \"words\": 1100, \"brand_score\": 8, \"risk\": 0, \"owner\": \"editorial\", \"title\": \"Invoice aging in plain language\"}, {\"id\": \"B-09\", \"topic\": \"A short note on cracked mugs\", \"channel\": \"social\", \"words\": 280, \"brand_score\": 7, \"risk\": 0, \"owner\": \"editorial\", \"title\": \"A short note on cracked mugs\"}, {\"id\": \"B-10\", \"topic\": \"Pickup window reminders\", \"channel\": \"social\", \"words\": 220, \"brand_score\": 8, \"risk\": 0, \"owner\": \"editorial\", \"title\": \"Pickup window reminders\"}, {\"id\": \"B-11\", \"topic\": \"The collections desk, without the jargon\", \"channel\": \"blog\", \"words\": 900, \"brand_score\": 6, \"risk\": 0, \"owner\": \"editorial\", \"title\": \"The collections desk, without the jargon\"}, {\"id\": \"B-12\", \"topic\": \"New SKU announcement, first draft\", \"channel\": \"blog\", \"words\": 600, \"brand_score\": 5, \"risk\": 0, \"owner\": \"editorial\", \"title\": \"New SKU announcement, first draft\"}, {\"id\": \"B-13\", \"topic\": \"Carrier air versus road\", \"channel\": \"blog\", \"words\": 950, \"brand_score\": 8, \"risk\": 0, \"owner\": \"editorial\", \"title\": \"Carrier air versus road\"}, {\"id\": \"B-14\", \"topic\": \"How we write a customer credit\", \"channel\": \"blog\", \"words\": 840, \"brand_score\": 9, \"risk\": 0, \"owner\": \"editorial\", \"title\": \"How we write a customer credit\"}, {\"id\": \"B-15\", \"topic\": \"Status page wording for a checkout slowdown\", \"channel\": \"newsletter\", \"words\": 500, \"brand_score\": 7, \"risk\": 0, \"owner\": \"editorial\", \"title\": \"Status page wording for a checkout slowdown\"}, {\"id\": \"B-16\", \"topic\": \"Three-line social post for the spring mug\", \"channel\": \"social\", \"words\": 80, \"brand_score\": 8, \"risk\": 0, \"owner\": \"editorial\", \"title\": \"Three-line social post for the spring mug\"}, {\"id\": \"B-17\", \"topic\": \"Chargeback files, a staff primer\", \"channel\": \"blog\", \"words\": 1000, \"brand_score\": 6.5, \"risk\": 0, \"owner\": \"editorial\", \"title\": \"Chargeback files, a staff primer\"}, {\"id\": \"B-18\", \"topic\": \"Medical claim for better sleep from a lamp\", \"channel\": \"blog\", \"words\": 450, \"brand_score\": 3, \"risk\": 1, \"owner\": \"editorial\", \"title\": \"Medical claim for better sleep from a lamp\"}];\nreturn briefs.map((row) => ({ json: row }));"
+      }
+    },
+    {
+      "id": "443f9123-4566-48c4-916c-ff5dcf45be5d",
+      "name": "Score Brand And Risk",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        220
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "\nconst rows = $input.all().map((item) => item.json);\nreturn rows.map((row) => {\n\n  const riskFlag = Number(row.risk) === 1 ? 1 : 0;\n  const revisionFlag = !riskFlag && Number(row.brand_score) < 7 ? 1 : 0;\n  const approvedFlag = !riskFlag && !revisionFlag ? 1 : 0;\n  const longform = approvedFlag && Number(row.words) >= 500 ? 1 : 0;\n  let lane = \"approved\";\n  if (riskFlag) lane = \"compliance\";\n  else if (revisionFlag) lane = \"revision\";\n  else if (longform) lane = \"longform\";\n  else lane = \"social\";\n  const action = {\n    compliance: \"Do not publish. Rewrite without the claim.\",\n    revision: \"Return to the writer. Brand score is under 7.\",\n    longform: \"Approve the outline, then cut social and newsletter versions.\",\n    social: \"Approve the short post and put it on the calendar.\"\n  }[lane];\n  return { json: { ...row, risk_flag: riskFlag, revision_flag: revisionFlag, approved_flag: approvedFlag, longform_flag: longform, lane, action, amount: 0 } };\n\n});\n"
+      }
+    },
+    {
+      "id": "c34a7b97-8c08-4a53-bb9a-79760123b994",
+      "name": "Assign Calendar Slot",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        980,
+        220
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "\nconst rows = $input.all().map((item) => item.json);\nreturn rows.map((row) => {\n\n  const days = [\"Mon\", \"Tue\", \"Wed\", \"Thu\", \"Fri\"];\n  const index = rows.indexOf(row);\n  return { json: { ...row, slot: days[index % days.length] + \" 09:30\" } };\n\n});\n"
+      }
+    },
+    {
+      "id": "75f1cb51-a927-4028-a693-d2530dc11f88",
+      "name": "Editorial Digest",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1300,
+        220
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "\nfunction fingerprint(value) {\n  const text = JSON.stringify(value);\n  let hash = 2166136261;\n  for (let i = 0; i < text.length; i++) {\n    hash ^= text.charCodeAt(i);\n    hash = Math.imul(hash, 16777619);\n  }\n  return (hash >>> 0).toString(16).padStart(8, \"0\");\n}\n\nconst rows = $input.all().map((item) => item.json);\nconst lanes = {};\nfor (const row of rows) {\n  if (!lanes[row.lane]) lanes[row.lane] = { count: 0, amount: 0, samples: [] };\n  lanes[row.lane].count += 1;\n  if (lanes[row.lane].samples.length < 3) lanes[row.lane].samples.push({ id: row.id, title: row.topic, slot: row.slot, action: row.action, brand_score: row.brand_score });\n}\nreturn [{ json: {\n  project: \"Content Operations Factory\",\n  generated_at: new Date().toISOString(),\n  records: rows.length,\n  lanes,\n  fingerprint: fingerprint(rows.map((row) => [row.id, row.lane, row.brand_score])),\n  headline: rows.length + \" briefs judged locally. Compliance holds never reach the calendar as publishable copy.\"\n} }];\n"
+      }
+    },
+    {
+      "id": "c8ad30ca-3853-4337-943e-cb4d6704b507",
+      "name": "Compliance Hold?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        980,
+        580
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "c08bb6d0-e346-4d52-8899-8ae7c996b439",
+              "leftValue": "={{ $json.risk_flag }}",
+              "rightValue": 1,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "fe8e2202-ed29-401b-83d1-dd30b3a6e36f",
+      "name": "Compliance Desk",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1300,
+        800
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "\nconst rows = $input.all().map((item) => item.json);\nreturn rows.map((row) => {\n  const next = { ...row };\n\n  next.desk = \"compliance\";\n  next.hold_reason = \"Brief contains a banned claim. Remove guaranteed, risk-free, or medical wording before another pass.\";\n\n  return { json: next };\n});\n"
+      }
+    },
+    {
+      "id": "ade4baa1-10f8-4cea-9d2c-4b60bb5d694e",
+      "name": "Needs Revision?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1300,
+        580
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "03797167-9933-41c9-a78b-f1c9ffa9cb3f",
+              "leftValue": "={{ $json.revision_flag }}",
+              "rightValue": 1,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "c8c9b5e7-7d9f-4eec-841f-d735f54c3cd9",
+      "name": "Revision Desk",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1640,
+        800
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "\nconst rows = $input.all().map((item) => item.json);\nreturn rows.map((row) => {\n  const next = { ...row };\n\n  next.desk = \"revision\";\n  next.note = \"Brand score \" + next.brand_score + \". Ask the writer for a second pass before cuts are made.\";\n\n  return { json: next };\n});\n"
+      }
+    },
+    {
+      "id": "40ff0a6a-d837-4362-a761-e9fe3f35d727",
+      "name": "Longform?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1640,
+        580
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "fc83f63a-2085-4f38-8741-519e2559180a",
+              "leftValue": "={{ $json.longform_flag }}",
+              "rightValue": 1,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "561e48fe-0c82-49ff-807e-f5feacb7be52",
+      "name": "Build Longform Pack",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1980,
+        460
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "\nconst rows = $input.all().map((item) => item.json);\nreturn rows.map((row) => {\n  const next = { ...row };\n\n  next.desk = \"longform\";\n  next.outline = [\"What the reader can do after reading\", \"One concrete local example\", \"The limit of the advice\", \"A single next step\"];\n  next.social_cut = next.topic + \" \u2014 a short version for the feed. No claims beyond the brief.\";\n  next.newsletter_cut = \"This week: \" + next.topic + \". Full note is \" + next.words + \" words.\";\n\n  return { json: next };\n});\n"
+      }
+    },
+    {
+      "id": "f392ea76-d670-49d8-a5c2-8d8a2ede3d39",
+      "name": "Build Social Pack",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1980,
+        860
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "\nconst rows = $input.all().map((item) => item.json);\nreturn rows.map((row) => {\n  const next = { ...row };\n\n  next.desk = \"social\";\n  next.social_cut = next.topic + \" (\" + next.words + \" words). Slot \" + next.slot + \".\";\n\n  return { json: next };\n});\n"
+      }
+    }
+  ],
+  "connections": {
+    "Run Content Factory": {
+      "main": [
+        [
+          {
+            "node": "Load Briefs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load Briefs": {
+      "main": [
+        [
+          {
+            "node": "Score Brand And Risk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Score Brand And Risk": {
+      "main": [
+        [
+          {
+            "node": "Assign Calendar Slot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assign Calendar Slot": {
+      "main": [
+        [
+          {
+            "node": "Editorial Digest",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Compliance Hold?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compliance Hold?": {
+      "main": [
+        [
+          {
+            "node": "Compliance Desk",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Needs Revision?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Needs Revision?": {
+      "main": [
+        [
+          {
+            "node": "Revision Desk",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Longform?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Longform?": {
+      "main": [
+        [
+          {
+            "node": "Build Longform Pack",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Build Social Pack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

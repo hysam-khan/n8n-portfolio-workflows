@@ -1,0 +1,643 @@
+{
+  "OrderCmdCenter01": {
+    "status": "success",
+    "startedAt": "2026-10-26T05:25:31.607Z",
+    "stoppedAt": "2026-10-26T05:25:32.503Z",
+    "digest": {
+      "project": "Order Command Center",
+      "generated_at": "2026-10-26T05:25:32.427Z",
+      "records": 36,
+      "lanes": {
+        "quarantine": {
+          "count": 4,
+          "amount": 0,
+          "samples": [
+            {
+              "id": "ORD-1001",
+              "customer": "(blank)",
+              "amount": 0,
+              "action": "Send the order back to entry. Do not reserve stock.",
+              "fraud_score": 0
+            },
+            {
+              "id": "ORD-1002",
+              "customer": "Pell & Loom",
+              "amount": 0,
+              "action": "Send the order back to entry. Do not reserve stock.",
+              "fraud_score": 0
+            },
+            {
+              "id": "ORD-1003",
+              "customer": "North Glass",
+              "amount": 0,
+              "action": "Send the order back to entry. Do not reserve stock.",
+              "fraud_score": 0
+            }
+          ]
+        },
+        "reject": {
+          "count": 4,
+          "amount": 5745.6,
+          "samples": [
+            {
+              "id": "ORD-1005",
+              "customer": "Veldt Supply",
+              "amount": 907.2,
+              "action": "Decline the payment and email the customer a plain reason.",
+              "fraud_score": 80
+            },
+            {
+              "id": "ORD-1006",
+              "customer": "Iona Market",
+              "amount": 2916,
+              "action": "Decline the payment and email the customer a plain reason.",
+              "fraud_score": 99
+            },
+            {
+              "id": "ORD-1007",
+              "customer": "Cairn Goods",
+              "amount": 1382.4,
+              "action": "Decline the payment and email the customer a plain reason.",
+              "fraud_score": 80
+            }
+          ]
+        },
+        "review": {
+          "count": 8,
+          "amount": 5022,
+          "samples": [
+            {
+              "id": "ORD-1008",
+              "customer": "Moth & Pine",
+              "amount": 324,
+              "action": "Hold the order for a person. Do not capture payment yet.",
+              "fraud_score": 50
+            },
+            {
+              "id": "ORD-1010",
+              "customer": "Harbor Thread",
+              "amount": 97.2,
+              "action": "Hold the order for a person. Do not capture payment yet.",
+              "fraud_score": 40
+            },
+            {
+              "id": "ORD-1011",
+              "customer": "Lumen Paper",
+              "amount": 302.4,
+              "action": "Hold the order for a person. Do not capture payment yet.",
+              "fraud_score": 0
+            }
+          ]
+        },
+        "parcel": {
+          "count": 11,
+          "amount": 2743.2,
+          "samples": [
+            {
+              "id": "ORD-1014",
+              "customer": "Wren Studio",
+              "amount": 118.8,
+              "action": "Capture payment, pick, and hand the parcel to the carrier.",
+              "fraud_score": 25
+            },
+            {
+              "id": "ORD-1100",
+              "customer": "Cedar Batch",
+              "amount": 194.4,
+              "action": "Capture payment, pick, and hand the parcel to the carrier.",
+              "fraud_score": 0
+            },
+            {
+              "id": "ORD-1101",
+              "customer": "Nimble Jar",
+              "amount": 209.52,
+              "action": "Capture payment, pick, and hand the parcel to the carrier.",
+              "fraud_score": 0
+            }
+          ]
+        },
+        "backorder": {
+          "count": 3,
+          "amount": 1404,
+          "samples": [
+            {
+              "id": "ORD-1201",
+              "customer": "Yellow Kiln",
+              "amount": 453.6,
+              "action": "Take payment, promise the revised ship date, and place a purchase order.",
+              "fraud_score": 0
+            },
+            {
+              "id": "ORD-1202",
+              "customer": "Zinc Cooperative",
+              "amount": 475.2,
+              "action": "Take payment, promise the revised ship date, and place a purchase order.",
+              "fraud_score": 0
+            },
+            {
+              "id": "ORD-1203",
+              "customer": "Alder Freight",
+              "amount": 475.2,
+              "action": "Take payment, promise the revised ship date, and place a purchase order.",
+              "fraud_score": 0
+            }
+          ]
+        },
+        "pickup": {
+          "count": 6,
+          "amount": 567,
+          "samples": [
+            {
+              "id": "ORD-1300",
+              "customer": "Birch Counter",
+              "amount": 70.2,
+              "action": "Capture payment and hold the order at the counter.",
+              "fraud_score": 0
+            },
+            {
+              "id": "ORD-1301",
+              "customer": "Cobalt Till",
+              "amount": 79.92,
+              "action": "Capture payment and hold the order at the counter.",
+              "fraud_score": 0
+            },
+            {
+              "id": "ORD-1302",
+              "customer": "Dune Register",
+              "amount": 89.64,
+              "action": "Capture payment and hold the order at the counter.",
+              "fraud_score": 0
+            }
+          ]
+        }
+      },
+      "captured_gross": 4714.2,
+      "held_gross": 10767.6,
+      "fingerprint": "5860435c",
+      "headline": "36 orders scored locally. Captured gross sits on parcel, pickup, and backorder. Review and reject stay uncaptured."
+    }
+  },
+  "RevReconcile0001": {
+    "status": "success",
+    "startedAt": "2026-10-26T05:25:36.242Z",
+    "stoppedAt": "2026-10-26T05:25:37.096Z",
+    "digest": {
+      "project": "Revenue Reconciliation and Leak Audit",
+      "generated_at": "2026-10-26T05:25:37.033Z",
+      "records": 26,
+      "lanes": {
+        "cleared": {
+          "count": 11,
+          "amount": 9890,
+          "gap": 0,
+          "samples": [
+            {
+              "id": "INV-501",
+              "customer": "Aster Mail",
+              "gap": 0,
+              "age_days": 12,
+              "action": "File the invoice as matched. No cash action."
+            },
+            {
+              "id": "INV-502",
+              "customer": "Birch Counter",
+              "gap": 0,
+              "age_days": 6,
+              "action": "File the invoice as matched. No cash action."
+            },
+            {
+              "id": "INV-503",
+              "customer": "Cobalt Till",
+              "gap": 0,
+              "age_days": 21,
+              "action": "File the invoice as matched. No cash action."
+            }
+          ]
+        },
+        "open": {
+          "count": 5,
+          "amount": 2930,
+          "gap": 1910,
+          "samples": [
+            {
+              "id": "INV-505",
+              "customer": "Elm Kiosk",
+              "gap": 40,
+              "age_days": 18,
+              "action": "Send a reminder. The balance is still inside terms."
+            },
+            {
+              "id": "INV-511",
+              "customer": "Lumen Paper",
+              "gap": 150,
+              "age_days": 12,
+              "action": "Send a reminder. The balance is still inside terms."
+            },
+            {
+              "id": "INV-512",
+              "customer": "Kite Postal",
+              "gap": 500,
+              "age_days": 20,
+              "action": "Send a reminder. The balance is still inside terms."
+            }
+          ]
+        },
+        "collections": {
+          "count": 4,
+          "amount": 5570,
+          "gap": 4870,
+          "samples": [
+            {
+              "id": "INV-514",
+              "customer": "Nimble Jar",
+              "gap": 1700,
+              "age_days": 50,
+              "action": "Send the aged balance to collections with the invoice and the last payment."
+            },
+            {
+              "id": "INV-515",
+              "customer": "Olive Press",
+              "gap": 1750,
+              "age_days": 61,
+              "action": "Send the aged balance to collections with the invoice and the last payment."
+            },
+            {
+              "id": "INV-516",
+              "customer": "Pell and Loom",
+              "gap": 780,
+              "age_days": 70,
+              "action": "Send the aged balance to collections with the invoice and the last payment."
+            }
+          ]
+        },
+        "chargeback": {
+          "count": 3,
+          "amount": 2820,
+          "gap": 1920,
+          "samples": [
+            {
+              "id": "INV-518",
+              "customer": "Salt Atelier",
+              "gap": 430,
+              "age_days": 22,
+              "action": "Open a representment file and freeze the related payout."
+            },
+            {
+              "id": "INV-519",
+              "customer": "Tin Wharf",
+              "gap": 890,
+              "age_days": 16,
+              "action": "Open a representment file and freeze the related payout."
+            },
+            {
+              "id": "INV-520",
+              "customer": "Umber Line",
+              "gap": 600,
+              "age_days": 27,
+              "action": "Open a representment file and freeze the related payout."
+            }
+          ]
+        },
+        "overpaid": {
+          "count": 3,
+          "amount": 1280,
+          "gap": -550,
+          "samples": [
+            {
+              "id": "INV-521",
+              "customer": "Violet Rack",
+              "gap": -150,
+              "age_days": 8,
+              "action": "Refund the extra cash or leave it as customer credit, and say which."
+            },
+            {
+              "id": "INV-522",
+              "customer": "Willow Bin",
+              "gap": -180,
+              "age_days": 15,
+              "action": "Refund the extra cash or leave it as customer credit, and say which."
+            },
+            {
+              "id": "INV-523",
+              "customer": "Yellow Kiln",
+              "gap": -220,
+              "age_days": 19,
+              "action": "Refund the extra cash or leave it as customer credit, and say which."
+            }
+          ]
+        }
+      },
+      "leakage_gap": 6790,
+      "fingerprint": "19eb3ee3",
+      "headline": "26 invoices matched locally. Leakage is the chargeback and aged-collection gap."
+    }
+  },
+  "SupportDesk00001": {
+    "status": "success",
+    "startedAt": "2026-10-26T05:25:40.819Z",
+    "stoppedAt": "2026-10-26T05:25:41.654Z",
+    "digest": {
+      "project": "Support Command Desk",
+      "generated_at": "2026-10-26T05:25:41.608Z",
+      "records": 28,
+      "lanes": {
+        "autoresolve": {
+          "count": 15,
+          "amount": 0,
+          "samples": [
+            {
+              "id": "T-01",
+              "customer": "Aster Mail",
+              "intent": "refund",
+              "sentiment": -0.2,
+              "action": "Send the drafted reply and close if the customer does not answer."
+            },
+            {
+              "id": "T-02",
+              "customer": "Birch Counter",
+              "intent": "order-status",
+              "sentiment": 0.1,
+              "action": "Send the drafted reply and close if the customer does not answer."
+            },
+            {
+              "id": "T-03",
+              "customer": "Cobalt Till",
+              "intent": "address-change",
+              "sentiment": 0.2,
+              "action": "Send the drafted reply and close if the customer does not answer."
+            }
+          ]
+        },
+        "escalate": {
+          "count": 6,
+          "amount": 0,
+          "samples": [
+            {
+              "id": "T-09",
+              "customer": "Iona Market",
+              "intent": "legal",
+              "sentiment": -0.4,
+              "action": "A person answers. Do not send the macro."
+            },
+            {
+              "id": "T-10",
+              "customer": "Quiet Lamp",
+              "intent": "charge",
+              "sentiment": -0.85,
+              "action": "A person answers. Do not send the macro."
+            },
+            {
+              "id": "T-11",
+              "customer": "Kite Postal",
+              "intent": "threat",
+              "sentiment": -0.7,
+              "action": "A person answers. Do not send the macro."
+            }
+          ]
+        },
+        "priority": {
+          "count": 7,
+          "amount": 0,
+          "samples": [
+            {
+              "id": "T-14",
+              "customer": "Nimble Jar",
+              "intent": "order-status",
+              "sentiment": -0.2,
+              "action": "Keep it in the one-hour queue and attach the prior tickets."
+            },
+            {
+              "id": "T-15",
+              "customer": "Olive Press",
+              "intent": "refund",
+              "sentiment": -0.3,
+              "action": "Keep it in the one-hour queue and attach the prior tickets."
+            },
+            {
+              "id": "T-16",
+              "customer": "Pell and Loom",
+              "intent": "damage",
+              "sentiment": -0.4,
+              "action": "Keep it in the one-hour queue and attach the prior tickets."
+            }
+          ]
+        }
+      },
+      "sla_breaches": 4,
+      "fingerprint": "ef0f10c2",
+      "headline": "28 tickets routed locally. 4 are already outside a 12-hour first response."
+    }
+  },
+  "ContentOpsFactory1": {
+    "status": "success",
+    "startedAt": "2026-10-26T05:25:45.408Z",
+    "stoppedAt": "2026-10-26T05:25:46.239Z",
+    "digest": {
+      "project": "Content Operations Factory",
+      "generated_at": "2026-10-26T05:25:46.189Z",
+      "records": 18,
+      "lanes": {
+        "longform": {
+          "count": 8,
+          "amount": 0,
+          "samples": [
+            {
+              "id": "B-01",
+              "title": "How a local kiln schedules a backorder",
+              "slot": "Mon 09:30",
+              "action": "Approve the outline, then cut social and newsletter versions.",
+              "brand_score": 9
+            },
+            {
+              "id": "B-02",
+              "title": "What a same-day pickup bin looks like",
+              "slot": "Tue 09:30",
+              "action": "Approve the outline, then cut social and newsletter versions.",
+              "brand_score": 8
+            },
+            {
+              "id": "B-03",
+              "title": "A week of parcel rate shopping",
+              "slot": "Wed 09:30",
+              "action": "Approve the outline, then cut social and newsletter versions.",
+              "brand_score": 8
+            }
+          ]
+        },
+        "compliance": {
+          "count": 4,
+          "amount": 0,
+          "samples": [
+            {
+              "id": "B-04",
+              "title": "Guaranteed cure for late shipments",
+              "slot": "Thu 09:30",
+              "action": "Do not publish. Rewrite without the claim.",
+              "brand_score": 6
+            },
+            {
+              "id": "B-05",
+              "title": "Double your revenue with this ledger trick",
+              "slot": "Fri 09:30",
+              "action": "Do not publish. Rewrite without the claim.",
+              "brand_score": 5
+            },
+            {
+              "id": "B-06",
+              "title": "Risk-free returns and zero effort growth",
+              "slot": "Mon 09:30",
+              "action": "Do not publish. Rewrite without the claim.",
+              "brand_score": 4
+            }
+          ]
+        },
+        "social": {
+          "count": 3,
+          "amount": 0,
+          "samples": [
+            {
+              "id": "B-09",
+              "title": "A short note on cracked mugs",
+              "slot": "Thu 09:30",
+              "action": "Approve the short post and put it on the calendar.",
+              "brand_score": 7
+            },
+            {
+              "id": "B-10",
+              "title": "Pickup window reminders",
+              "slot": "Fri 09:30",
+              "action": "Approve the short post and put it on the calendar.",
+              "brand_score": 8
+            },
+            {
+              "id": "B-16",
+              "title": "Three-line social post for the spring mug",
+              "slot": "Mon 09:30",
+              "action": "Approve the short post and put it on the calendar.",
+              "brand_score": 8
+            }
+          ]
+        },
+        "revision": {
+          "count": 3,
+          "amount": 0,
+          "samples": [
+            {
+              "id": "B-11",
+              "title": "The collections desk, without the jargon",
+              "slot": "Mon 09:30",
+              "action": "Return to the writer. Brand score is under 7.",
+              "brand_score": 6
+            },
+            {
+              "id": "B-12",
+              "title": "New SKU announcement, first draft",
+              "slot": "Tue 09:30",
+              "action": "Return to the writer. Brand score is under 7.",
+              "brand_score": 5
+            },
+            {
+              "id": "B-17",
+              "title": "Chargeback files, a staff primer",
+              "slot": "Tue 09:30",
+              "action": "Return to the writer. Brand score is under 7.",
+              "brand_score": 6.5
+            }
+          ]
+        }
+      },
+      "fingerprint": "2df9fb84",
+      "headline": "18 briefs judged locally. Compliance holds never reach the calendar as publishable copy."
+    }
+  },
+  "IncidentCommand01": {
+    "status": "success",
+    "startedAt": "2026-10-26T05:25:50.063Z",
+    "stoppedAt": "2026-10-26T05:25:50.892Z",
+    "digest": {
+      "project": "Incident Command and Postmortem",
+      "generated_at": "2026-10-26T05:25:50.847Z",
+      "records": 8,
+      "source_alerts": 25,
+      "lanes": {
+        "sev1": {
+          "count": 3,
+          "amount": 500,
+          "samples": [
+            {
+              "id": "INC-checkout-api",
+              "title": "checkout-api / latency",
+              "alerts": 4,
+              "action": "Open the bridge, freeze deploys, and roll back the last change if the error budget is burning.",
+              "customer_minutes": 200
+            },
+            {
+              "id": "INC-ledger-worker",
+              "title": "ledger-worker / crash-loop",
+              "alerts": 3,
+              "action": "Open the bridge, freeze deploys, and roll back the last change if the error budget is burning.",
+              "customer_minutes": 150
+            },
+            {
+              "id": "INC-auth-gateway",
+              "title": "auth-gateway / error-rate",
+              "alerts": 3,
+              "action": "Open the bridge, freeze deploys, and roll back the last change if the error budget is burning.",
+              "customer_minutes": 150
+            }
+          ]
+        },
+        "status": {
+          "count": 2,
+          "amount": 80,
+          "samples": [
+            {
+              "id": "INC-email-worker",
+              "title": "email-worker / delay",
+              "alerts": 3,
+              "action": "Draft a status note. No bridge unless it worsens to severity 1.",
+              "customer_minutes": 48
+            },
+            {
+              "id": "INC-cdn-cache",
+              "title": "cdn-cache / stale",
+              "alerts": 2,
+              "action": "Draft a status note. No bridge unless it worsens to severity 1.",
+              "customer_minutes": 32
+            }
+          ]
+        },
+        "internal": {
+          "count": 3,
+          "amount": 0,
+          "samples": [
+            {
+              "id": "INC-search-index",
+              "title": "search-index / typo-regression",
+              "alerts": 4,
+              "action": "File it. Do not page the customer owner.",
+              "customer_minutes": 0
+            },
+            {
+              "id": "INC-docs-site",
+              "title": "docs-site / 404",
+              "alerts": 3,
+              "action": "File it. Do not page the customer owner.",
+              "customer_minutes": 0
+            },
+            {
+              "id": "INC-billing-pdf",
+              "title": "billing-pdf / slow-render",
+              "alerts": 3,
+              "action": "File it. Do not page the customer owner.",
+              "customer_minutes": 0
+            }
+          ]
+        }
+      },
+      "customer_minutes": 580,
+      "fingerprint": "cbda52f5",
+      "headline": "25 alerts collapsed into 8 incidents. Customer impact is an estimate from severity and duration, not a live status page."
+    }
+  }
+}

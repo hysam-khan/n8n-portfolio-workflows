@@ -1,0 +1,303 @@
+{
+  "id": "SupportDesk00001",
+  "name": "Support Command Desk",
+  "description": "Classify a local ticket queue by intent, sentiment, SLA risk, and legal language, then write an escalation, a priority packet, or an auto-reply.",
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "nodes": [
+    {
+      "id": "d84a31bb-5a03-4305-acc6-66a8de80343c",
+      "name": "## Queue",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        -260
+      ],
+      "parameters": {
+        "content": "## Queue\nTwenty-eight sample tickets. Sentiment and intent are already on the row so the desk can run without an AI credential.",
+        "height": 200,
+        "width": 740,
+        "color": 4
+      }
+    },
+    {
+      "id": "5dcf067a-8574-4a46-be16-1bfb84e324e6",
+      "name": "## Routing",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        -260
+      ],
+      "parameters": {
+        "content": "## Routing\nLegal language, very negative sentiment, or an angry VIP goes to a person. Repeat contacts and old tickets go to the priority queue. The rest get a drafted reply.",
+        "height": 220,
+        "width": 820,
+        "color": 3
+      }
+    },
+    {
+      "id": "1868d3ad-15e7-437b-a7e3-e5f5d6168ebf",
+      "name": "Run Support Desk",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        200
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "9adef07e-e067-484e-a2fe-26fec8da06fe",
+      "name": "Load Ticket Queue",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        320,
+        200
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const tickets = [{\"id\": \"T-01\", \"customer\": \"Aster Mail\", \"intent\": \"refund\", \"sentiment\": -0.2, \"age_hours\": 3, \"vip\": 0, \"legal\": 0, \"repeats\": 1, \"channel\": \"email\", \"title\": \"refund / Aster Mail\", \"body\": \"The mug arrived cracked. I would like a refund.\"}, {\"id\": \"T-02\", \"customer\": \"Birch Counter\", \"intent\": \"order-status\", \"sentiment\": 0.1, \"age_hours\": 2, \"vip\": 0, \"legal\": 0, \"repeats\": 1, \"channel\": \"email\", \"title\": \"order-status / Birch Counter\", \"body\": \"Where is order ORD-1104?\"}, {\"id\": \"T-03\", \"customer\": \"Cobalt Till\", \"intent\": \"address-change\", \"sentiment\": 0.2, \"age_hours\": 1, \"vip\": 0, \"legal\": 0, \"repeats\": 1, \"channel\": \"email\", \"title\": \"address-change / Cobalt Till\", \"body\": \"Please change the ship-to before it leaves.\"}, {\"id\": \"T-04\", \"customer\": \"Dune Register\", \"intent\": \"invoice-copy\", \"sentiment\": 0.4, \"age_hours\": 5, \"vip\": 0, \"legal\": 0, \"repeats\": 1, \"channel\": \"email\", \"title\": \"invoice-copy / Dune Register\", \"body\": \"Can you resend invoice INV-504?\"}, {\"id\": \"T-05\", \"customer\": \"Elm Kiosk\", \"intent\": \"password\", \"sentiment\": 0.0, \"age_hours\": 1, \"vip\": 0, \"legal\": 0, \"repeats\": 1, \"channel\": \"email\", \"title\": \"password / Elm Kiosk\", \"body\": \"I cannot reset my password.\"}, {\"id\": \"T-06\", \"customer\": \"Fern Window\", \"intent\": \"order-status\", \"sentiment\": 0.3, \"age_hours\": 4, \"vip\": 0, \"legal\": 0, \"repeats\": 1, \"channel\": \"email\", \"title\": \"order-status / Fern Window\", \"body\": \"Has the pickup been packed?\"}, {\"id\": \"T-07\", \"customer\": \"Gilt Counter\", \"intent\": \"refund\", \"sentiment\": -0.1, \"age_hours\": 6, \"vip\": 0, \"legal\": 0, \"repeats\": 1, \"channel\": \"email\", \"title\": \"refund / Gilt Counter\", \"body\": \"Wrong color. Please refund the difference.\"}, {\"id\": \"T-08\", \"customer\": \"Harbor Thread\", \"intent\": \"invoice-copy\", \"sentiment\": 0.2, \"age_hours\": 2, \"vip\": 0, \"legal\": 0, \"repeats\": 1, \"channel\": \"email\", \"title\": \"invoice-copy / Harbor Thread\", \"body\": \"Need a PDF of last month's invoice.\"}, {\"id\": \"T-09\", \"customer\": \"Iona Market\", \"intent\": \"legal\", \"sentiment\": -0.4, \"age_hours\": 5, \"vip\": 0, \"legal\": 1, \"repeats\": 1, \"channel\": \"email\", \"title\": \"legal / Iona Market\", \"body\": \"My lawyer asked for the contract and the charge record.\"}, {\"id\": \"T-10\", \"customer\": \"Quiet Lamp\", \"intent\": \"charge\", \"sentiment\": -0.85, \"age_hours\": 9, \"vip\": 1, \"legal\": 0, \"repeats\": 1, \"channel\": \"email\", \"title\": \"charge / Quiet Lamp\", \"body\": \"This charge is outrageous and I am furious.\"}, {\"id\": \"T-11\", \"customer\": \"Kite Postal\", \"intent\": \"threat\", \"sentiment\": -0.7, \"age_hours\": 3, \"vip\": 0, \"legal\": 1, \"repeats\": 1, \"channel\": \"email\", \"title\": \"threat / Kite Postal\", \"body\": \"I will take this to small claims if you do not reply today.\"}, {\"id\": \"T-12\", \"customer\": \"Lumen Paper\", \"intent\": \"outage\", \"sentiment\": -0.9, \"age_hours\": 2, \"vip\": 1, \"legal\": 0, \"repeats\": 1, \"channel\": \"email\", \"title\": \"outage / Lumen Paper\", \"body\": \"Your portal has been down and this is unacceptable.\"}, {\"id\": \"T-13\", \"customer\": \"Moth and Pine\", \"intent\": \"refund\", \"sentiment\": -0.75, \"age_hours\": 7, \"vip\": 0, \"legal\": 0, \"repeats\": 1, \"channel\": \"email\", \"title\": \"refund / Moth and Pine\", \"body\": \"I have asked three times and I am done being polite.\"}, {\"id\": \"T-14\", \"customer\": \"Nimble Jar\", \"intent\": \"order-status\", \"sentiment\": -0.2, \"age_hours\": 14, \"vip\": 0, \"legal\": 0, \"repeats\": 4, \"channel\": \"email\", \"title\": \"order-status / Nimble Jar\", \"body\": \"Fourth time asking where the carton is.\"}, {\"id\": \"T-15\", \"customer\": \"Olive Press\", \"intent\": \"refund\", \"sentiment\": -0.3, \"age_hours\": 20, \"vip\": 0, \"legal\": 0, \"repeats\": 3, \"channel\": \"email\", \"title\": \"refund / Olive Press\", \"body\": \"Still waiting on the refund you promised.\"}, {\"id\": \"T-16\", \"customer\": \"Pell and Loom\", \"intent\": \"damage\", \"sentiment\": -0.4, \"age_hours\": 11, \"vip\": 0, \"legal\": 0, \"repeats\": 2, \"channel\": \"email\", \"title\": \"damage / Pell and Loom\", \"body\": \"Two damaged lamps in the same delivery.\"}, {\"id\": \"T-17\", \"customer\": \"Red Docket\", \"intent\": \"billing\", \"sentiment\": 0.0, \"age_hours\": 16, \"vip\": 1, \"legal\": 0, \"repeats\": 1, \"channel\": \"email\", \"title\": \"billing / Red Docket\", \"body\": \"Please explain the extra line on the gold-tier invoice.\"}, {\"id\": \"T-18\", \"customer\": \"Salt Atelier\", \"intent\": \"shipping\", \"sentiment\": -0.1, \"age_hours\": 10, \"vip\": 0, \"legal\": 0, \"repeats\": 3, \"channel\": \"email\", \"title\": \"shipping / Salt Atelier\", \"body\": \"Tracking has not moved since Monday.\"}, {\"id\": \"T-19\", \"customer\": \"Tin Wharf\", \"intent\": \"order-status\", \"sentiment\": 0.5, \"age_hours\": 1, \"vip\": 0, \"legal\": 0, \"repeats\": 1, \"channel\": \"email\", \"title\": \"order-status / Tin Wharf\", \"body\": \"Thanks, just checking the pickup window.\"}, {\"id\": \"T-20\", \"customer\": \"Umber Line\", \"intent\": \"address-change\", \"sentiment\": 0.1, \"age_hours\": 2, \"vip\": 0, \"legal\": 0, \"repeats\": 1, \"channel\": \"email\", \"title\": \"address-change / Umber Line\", \"body\": \"Suite number was missing.\"}, {\"id\": \"T-21\", \"customer\": \"Violet Rack\", \"intent\": \"invoice-copy\", \"sentiment\": 0.0, \"age_hours\": 3, \"vip\": 0, \"legal\": 0, \"repeats\": 1, \"channel\": \"email\", \"title\": \"invoice-copy / Violet Rack\", \"body\": \"Accounts payable needs the invoice resent.\"}, {\"id\": \"T-22\", \"customer\": \"Willow Bin\", \"intent\": \"password\", \"sentiment\": -0.1, \"age_hours\": 2, \"vip\": 0, \"legal\": 0, \"repeats\": 1, \"channel\": \"email\", \"title\": \"password / Willow Bin\", \"body\": \"Reset link expired.\"}, {\"id\": \"T-23\", \"customer\": \"Yellow Kiln\", \"intent\": \"order-status\", \"sentiment\": 0.2, \"age_hours\": 6, \"vip\": 0, \"legal\": 0, \"repeats\": 1, \"channel\": \"email\", \"title\": \"order-status / Yellow Kiln\", \"body\": \"Can you confirm the backorder date?\"}, {\"id\": \"T-24\", \"customer\": \"Zinc Cooperative\", \"intent\": \"refund\", \"sentiment\": -0.05, \"age_hours\": 4, \"vip\": 0, \"legal\": 0, \"repeats\": 1, \"channel\": \"email\", \"title\": \"refund / Zinc Cooperative\", \"body\": \"One item from the set was missing.\"}, {\"id\": \"T-25\", \"customer\": \"Alder Freight\", \"intent\": \"damage\", \"sentiment\": -0.8, \"age_hours\": 1, \"vip\": 0, \"legal\": 0, \"repeats\": 1, \"channel\": \"email\", \"title\": \"damage / Alder Freight\", \"body\": \"The crate was crushed and I want this escalated now.\"}, {\"id\": \"T-26\", \"customer\": \"Cedar Batch\", \"intent\": \"shipping\", \"sentiment\": -0.15, \"age_hours\": 18, \"vip\": 0, \"legal\": 0, \"repeats\": 1, \"channel\": \"email\", \"title\": \"shipping / Cedar Batch\", \"body\": \"Promised Friday, now it says next week.\"}, {\"id\": \"T-27\", \"customer\": \"Wren Studio\", \"intent\": \"billing\", \"sentiment\": -0.2, \"age_hours\": 9, \"vip\": 0, \"legal\": 0, \"repeats\": 4, \"channel\": \"email\", \"title\": \"billing / Wren Studio\", \"body\": \"You charged the card twice.\"}, {\"id\": \"T-28\", \"customer\": \"Ochre Home\", \"intent\": \"order-status\", \"sentiment\": 0.6, \"age_hours\": 1, \"vip\": 0, \"legal\": 0, \"repeats\": 1, \"channel\": \"email\", \"title\": \"order-status / Ochre Home\", \"body\": \"All good, sending a thank-you and a sizing question.\"}];\nreturn tickets.map((row) => ({ json: row }));"
+      }
+    },
+    {
+      "id": "f21c5d15-4d97-4207-a5d0-0445c7cc3fe6",
+      "name": "Classify Intent And Risk",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        200
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "\nconst rows = $input.all().map((item) => item.json);\nreturn rows.map((row) => {\n\n  const sentiment = Number(row.sentiment);\n  const escalate = Number(row.legal) === 1 || sentiment <= -0.7 || (Number(row.vip) === 1 && sentiment < -0.4) ? 1 : 0;\n  const priority = !escalate && (Number(row.age_hours) >= 10 || Number(row.repeats) >= 3) ? 1 : 0;\n  const autoFlag = !escalate && !priority ? 1 : 0;\n  let lane = \"autoresolve\";\n  if (escalate) lane = \"escalate\";\n  else if (priority) lane = \"priority\";\n  const action = {\n    escalate: \"A person answers. Do not send the macro.\",\n    priority: \"Keep it in the one-hour queue and attach the prior tickets.\",\n    autoresolve: \"Send the drafted reply and close if the customer does not answer.\"\n  }[lane];\n  return { json: { ...row, sentiment, escalate_flag: escalate, priority_flag: priority, auto_flag: autoFlag, lane, action, amount: 0 } };\n\n});\n"
+      }
+    },
+    {
+      "id": "cf1c7fd1-93e1-40fd-b8b4-998d7cf54a06",
+      "name": "SLA And Staffing",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        980,
+        200
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "\nconst rows = $input.all().map((item) => item.json);\nreturn rows.map((row) => {\n  const next = { ...row };\n\n  next.breach = Number(next.age_hours) >= 12 ? 1 : 0;\n  next.queue_minutes = next.lane === \"escalate\" ? 15 : next.lane === \"priority\" ? 60 : 5;\n\n  return { json: next };\n});\n"
+      }
+    },
+    {
+      "id": "e9ef06eb-37fc-41fd-bf80-a2fb01f6041a",
+      "name": "Ops Brief",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1300,
+        200
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "\nfunction fingerprint(value) {\n  const text = JSON.stringify(value);\n  let hash = 2166136261;\n  for (let i = 0; i < text.length; i++) {\n    hash ^= text.charCodeAt(i);\n    hash = Math.imul(hash, 16777619);\n  }\n  return (hash >>> 0).toString(16).padStart(8, \"0\");\n}\n\nconst rows = $input.all().map((item) => item.json);\nconst lanes = {};\nfor (const row of rows) {\n  if (!lanes[row.lane]) lanes[row.lane] = { count: 0, amount: 0, samples: [] };\n  lanes[row.lane].count += 1;\n  if (lanes[row.lane].samples.length < 3) lanes[row.lane].samples.push({ id: row.id, customer: row.customer, intent: row.intent, sentiment: row.sentiment, action: row.action });\n}\nconst breaches = rows.filter((row) => row.breach).length;\nreturn [{ json: {\n  project: \"Support Command Desk\",\n  generated_at: new Date().toISOString(),\n  records: rows.length,\n  lanes,\n  sla_breaches: breaches,\n  fingerprint: fingerprint(rows.map((row) => [row.id, row.lane, row.sentiment])),\n  headline: rows.length + \" tickets routed locally. \" + breaches + \" are already outside a 12-hour first response.\"\n} }];\n"
+      }
+    },
+    {
+      "id": "2fdde9c6-447c-46e3-bc0c-6de2b7185a66",
+      "name": "Escalate?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        980,
+        560
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "429e572f-bcfb-41c9-a6ee-2ff3793369ad",
+              "leftValue": "={{ $json.escalate_flag }}",
+              "rightValue": 1,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "b99d892f-2abc-42b0-9bb1-d0a27365b059",
+      "name": "Escalation Desk",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1300,
+        780
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "\nconst rows = $input.all().map((item) => item.json);\nreturn rows.map((row) => {\n  const next = { ...row };\n\n  next.desk = \"escalate\";\n  next.note = next.legal ? \"Legal wording. Do not argue the claim in the macro.\" : \"High emotion. A person owns the next reply.\";\n\n  return { json: next };\n});\n"
+      }
+    },
+    {
+      "id": "ef4d9d97-2968-46f7-a13a-eef6fa1f04e8",
+      "name": "Priority Queue?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1300,
+        560
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "3badbb05-d8cc-433f-805f-d1977c9eb6f0",
+              "leftValue": "={{ $json.priority_flag }}",
+              "rightValue": 1,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "e0362072-0092-4e7f-b2b5-f73d66200a8c",
+      "name": "Priority Desk",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1640,
+        760
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "\nconst rows = $input.all().map((item) => item.json);\nreturn rows.map((row) => {\n  const next = { ...row };\n\n  next.desk = \"priority\";\n  next.packet = next.repeats + \" contacts, \" + next.age_hours + \" hours old, intent \" + next.intent + \".\";\n\n  return { json: next };\n});\n"
+      }
+    },
+    {
+      "id": "5d622896-977d-4f55-ae81-ea9ea9eab2f7",
+      "name": "Draft Auto Reply",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1640,
+        1040
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "\nconst rows = $input.all().map((item) => item.json);\nreturn rows.map((row) => {\n\n  const replies = {\n    refund: \"We can see the refund request for \" + row.customer + \". A credit memo will be issued against the original payment.\",\n    \"order-status\": \"Your order is in the local queue. We will send the next tracking or pickup update within one business day.\",\n    \"address-change\": \"If the parcel has not been handed to the carrier, we will apply the address change.\",\n    \"invoice-copy\": \"A copy of the invoice is attached in the local packet for \" + row.customer + \".\",\n    password: \"Use the reset link within 30 minutes. If it expires, reply and a person will check the account.\",\n    damage: \"We are sorry the goods arrived damaged. Keep the photos with this ticket.\",\n    shipping: \"Tracking is being checked against the carrier scan history.\",\n    billing: \"The extra line is under review against the original order total.\",\n    charge: \"A person will look at the charge. This macro is not used when the ticket is escalated.\",\n    threat: \"A person will answer.\",\n    legal: \"A person will answer.\",\n    outage: \"A person will answer.\"\n  };\n  return { json: { ...row, desk: \"autoresolve\", reply: replies[row.intent] || \"Thanks for writing. We are checking this now.\" } };\n\n});\n"
+      }
+    }
+  ],
+  "connections": {
+    "Run Support Desk": {
+      "main": [
+        [
+          {
+            "node": "Load Ticket Queue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load Ticket Queue": {
+      "main": [
+        [
+          {
+            "node": "Classify Intent And Risk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classify Intent And Risk": {
+      "main": [
+        [
+          {
+            "node": "SLA And Staffing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SLA And Staffing": {
+      "main": [
+        [
+          {
+            "node": "Ops Brief",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Escalate?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Escalate?": {
+      "main": [
+        [
+          {
+            "node": "Escalation Desk",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Priority Queue?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Priority Queue?": {
+      "main": [
+        [
+          {
+            "node": "Priority Desk",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Draft Auto Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

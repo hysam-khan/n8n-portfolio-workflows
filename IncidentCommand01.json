@@ -1,0 +1,328 @@
+{
+  "id": "IncidentCommand01",
+  "name": "Incident Command and Postmortem",
+  "description": "Correlate a local alert stream into incidents, open a bridge for severity 1, draft a status note for customer-facing issues, and file internal noise.",
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "nodes": [
+    {
+      "id": "8fbdfbf0-b495-430d-b34b-fbf08d8cff2b",
+      "name": "## Alerts",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        -250
+      ],
+      "parameters": {
+        "content": "## Alerts\nTwenty-five sample alerts. Correlation collapses repeats of the same service and symptom into one incident.",
+        "height": 200,
+        "width": 700,
+        "color": 1
+      }
+    },
+    {
+      "id": "94de0db6-21ce-4e1e-a5be-d06762aebb30",
+      "name": "## Command",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        -250
+      ],
+      "parameters": {
+        "content": "## Command\nSeverity 1 opens a bridge and a rollback note. Other customer-facing incidents get a status draft. Internal noise is filed, not paged.",
+        "height": 210,
+        "width": 760,
+        "color": 6
+      }
+    },
+    {
+      "id": "0ed58b57-abce-4307-8ac0-66145780d867",
+      "name": "Run Incident Command",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        220
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "5ec45d71-0c07-4584-ab44-895df90c2443",
+      "name": "Load Alert Stream",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        320,
+        220
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const alerts = [{\"id\": \"A-CHE-0\", \"service\": \"checkout-api\", \"symptom\": \"latency\", \"severity\": 1, \"customer_facing\": 1, \"minute\": 0, \"region\": \"local\", \"title\": \"checkout-api latency\"}, {\"id\": \"A-CHE-1\", \"service\": \"checkout-api\", \"symptom\": \"latency\", \"severity\": 1, \"customer_facing\": 1, \"minute\": 2, \"region\": \"local\", \"title\": \"checkout-api latency\"}, {\"id\": \"A-CHE-2\", \"service\": \"checkout-api\", \"symptom\": \"latency\", \"severity\": 1, \"customer_facing\": 1, \"minute\": 4, \"region\": \"local\", \"title\": \"checkout-api latency\"}, {\"id\": \"A-CHE-3\", \"service\": \"checkout-api\", \"symptom\": \"latency\", \"severity\": 1, \"customer_facing\": 1, \"minute\": 6, \"region\": \"local\", \"title\": \"checkout-api latency\"}, {\"id\": \"A-LED-20\", \"service\": \"ledger-worker\", \"symptom\": \"crash-loop\", \"severity\": 1, \"customer_facing\": 1, \"minute\": 20, \"region\": \"local\", \"title\": \"ledger-worker crash-loop\"}, {\"id\": \"A-LED-21\", \"service\": \"ledger-worker\", \"symptom\": \"crash-loop\", \"severity\": 1, \"customer_facing\": 1, \"minute\": 22, \"region\": \"local\", \"title\": \"ledger-worker crash-loop\"}, {\"id\": \"A-LED-22\", \"service\": \"ledger-worker\", \"symptom\": \"crash-loop\", \"severity\": 1, \"customer_facing\": 1, \"minute\": 24, \"region\": \"local\", \"title\": \"ledger-worker crash-loop\"}, {\"id\": \"A-AUT-40\", \"service\": \"auth-gateway\", \"symptom\": \"error-rate\", \"severity\": 1, \"customer_facing\": 1, \"minute\": 40, \"region\": \"local\", \"title\": \"auth-gateway error-rate\"}, {\"id\": \"A-AUT-41\", \"service\": \"auth-gateway\", \"symptom\": \"error-rate\", \"severity\": 1, \"customer_facing\": 1, \"minute\": 42, \"region\": \"local\", \"title\": \"auth-gateway error-rate\"}, {\"id\": \"A-AUT-42\", \"service\": \"auth-gateway\", \"symptom\": \"error-rate\", \"severity\": 1, \"customer_facing\": 1, \"minute\": 44, \"region\": \"local\", \"title\": \"auth-gateway error-rate\"}, {\"id\": \"A-EMA-60\", \"service\": \"email-worker\", \"symptom\": \"delay\", \"severity\": 2, \"customer_facing\": 1, \"minute\": 60, \"region\": \"local\", \"title\": \"email-worker delay\"}, {\"id\": \"A-EMA-61\", \"service\": \"email-worker\", \"symptom\": \"delay\", \"severity\": 2, \"customer_facing\": 1, \"minute\": 62, \"region\": \"local\", \"title\": \"email-worker delay\"}, {\"id\": \"A-EMA-62\", \"service\": \"email-worker\", \"symptom\": \"delay\", \"severity\": 2, \"customer_facing\": 1, \"minute\": 64, \"region\": \"local\", \"title\": \"email-worker delay\"}, {\"id\": \"A-CDN-80\", \"service\": \"cdn-cache\", \"symptom\": \"stale\", \"severity\": 2, \"customer_facing\": 1, \"minute\": 80, \"region\": \"local\", \"title\": \"cdn-cache stale\"}, {\"id\": \"A-CDN-81\", \"service\": \"cdn-cache\", \"symptom\": \"stale\", \"severity\": 2, \"customer_facing\": 1, \"minute\": 82, \"region\": \"local\", \"title\": \"cdn-cache stale\"}, {\"id\": \"A-SEA-100\", \"service\": \"search-index\", \"symptom\": \"typo-regression\", \"severity\": 3, \"customer_facing\": 0, \"minute\": 100, \"region\": \"local\", \"title\": \"search-index typo-regression\"}, {\"id\": \"A-SEA-101\", \"service\": \"search-index\", \"symptom\": \"typo-regression\", \"severity\": 3, \"customer_facing\": 0, \"minute\": 102, \"region\": \"local\", \"title\": \"search-index typo-regression\"}, {\"id\": \"A-SEA-102\", \"service\": \"search-index\", \"symptom\": \"typo-regression\", \"severity\": 3, \"customer_facing\": 0, \"minute\": 104, \"region\": \"local\", \"title\": \"search-index typo-regression\"}, {\"id\": \"A-SEA-103\", \"service\": \"search-index\", \"symptom\": \"typo-regression\", \"severity\": 3, \"customer_facing\": 0, \"minute\": 106, \"region\": \"local\", \"title\": \"search-index typo-regression\"}, {\"id\": \"A-DOC-120\", \"service\": \"docs-site\", \"symptom\": \"404\", \"severity\": 4, \"customer_facing\": 0, \"minute\": 120, \"region\": \"local\", \"title\": \"docs-site 404\"}, {\"id\": \"A-DOC-121\", \"service\": \"docs-site\", \"symptom\": \"404\", \"severity\": 4, \"customer_facing\": 0, \"minute\": 122, \"region\": \"local\", \"title\": \"docs-site 404\"}, {\"id\": \"A-DOC-122\", \"service\": \"docs-site\", \"symptom\": \"404\", \"severity\": 4, \"customer_facing\": 0, \"minute\": 124, \"region\": \"local\", \"title\": \"docs-site 404\"}, {\"id\": \"A-BIL-140\", \"service\": \"billing-pdf\", \"symptom\": \"slow-render\", \"severity\": 3, \"customer_facing\": 0, \"minute\": 140, \"region\": \"local\", \"title\": \"billing-pdf slow-render\"}, {\"id\": \"A-BIL-141\", \"service\": \"billing-pdf\", \"symptom\": \"slow-render\", \"severity\": 3, \"customer_facing\": 0, \"minute\": 142, \"region\": \"local\", \"title\": \"billing-pdf slow-render\"}, {\"id\": \"A-BIL-142\", \"service\": \"billing-pdf\", \"symptom\": \"slow-render\", \"severity\": 3, \"customer_facing\": 0, \"minute\": 144, \"region\": \"local\", \"title\": \"billing-pdf slow-render\"}];\nreturn alerts.map((row) => ({ json: row }));"
+      }
+    },
+    {
+      "id": "f3bb6d47-e4a4-4a44-9af5-58c863d84177",
+      "name": "Correlate Into Incidents",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        680,
+        220
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "\nconst alerts = [{\"id\": \"A-CHE-0\", \"service\": \"checkout-api\", \"symptom\": \"latency\", \"severity\": 1, \"customer_facing\": 1, \"minute\": 0, \"region\": \"local\", \"title\": \"checkout-api latency\"}, {\"id\": \"A-CHE-1\", \"service\": \"checkout-api\", \"symptom\": \"latency\", \"severity\": 1, \"customer_facing\": 1, \"minute\": 2, \"region\": \"local\", \"title\": \"checkout-api latency\"}, {\"id\": \"A-CHE-2\", \"service\": \"checkout-api\", \"symptom\": \"latency\", \"severity\": 1, \"customer_facing\": 1, \"minute\": 4, \"region\": \"local\", \"title\": \"checkout-api latency\"}, {\"id\": \"A-CHE-3\", \"service\": \"checkout-api\", \"symptom\": \"latency\", \"severity\": 1, \"customer_facing\": 1, \"minute\": 6, \"region\": \"local\", \"title\": \"checkout-api latency\"}, {\"id\": \"A-LED-20\", \"service\": \"ledger-worker\", \"symptom\": \"crash-loop\", \"severity\": 1, \"customer_facing\": 1, \"minute\": 20, \"region\": \"local\", \"title\": \"ledger-worker crash-loop\"}, {\"id\": \"A-LED-21\", \"service\": \"ledger-worker\", \"symptom\": \"crash-loop\", \"severity\": 1, \"customer_facing\": 1, \"minute\": 22, \"region\": \"local\", \"title\": \"ledger-worker crash-loop\"}, {\"id\": \"A-LED-22\", \"service\": \"ledger-worker\", \"symptom\": \"crash-loop\", \"severity\": 1, \"customer_facing\": 1, \"minute\": 24, \"region\": \"local\", \"title\": \"ledger-worker crash-loop\"}, {\"id\": \"A-AUT-40\", \"service\": \"auth-gateway\", \"symptom\": \"error-rate\", \"severity\": 1, \"customer_facing\": 1, \"minute\": 40, \"region\": \"local\", \"title\": \"auth-gateway error-rate\"}, {\"id\": \"A-AUT-41\", \"service\": \"auth-gateway\", \"symptom\": \"error-rate\", \"severity\": 1, \"customer_facing\": 1, \"minute\": 42, \"region\": \"local\", \"title\": \"auth-gateway error-rate\"}, {\"id\": \"A-AUT-42\", \"service\": \"auth-gateway\", \"symptom\": \"error-rate\", \"severity\": 1, \"customer_facing\": 1, \"minute\": 44, \"region\": \"local\", \"title\": \"auth-gateway error-rate\"}, {\"id\": \"A-EMA-60\", \"service\": \"email-worker\", \"symptom\": \"delay\", \"severity\": 2, \"customer_facing\": 1, \"minute\": 60, \"region\": \"local\", \"title\": \"email-worker delay\"}, {\"id\": \"A-EMA-61\", \"service\": \"email-worker\", \"symptom\": \"delay\", \"severity\": 2, \"customer_facing\": 1, \"minute\": 62, \"region\": \"local\", \"title\": \"email-worker delay\"}, {\"id\": \"A-EMA-62\", \"service\": \"email-worker\", \"symptom\": \"delay\", \"severity\": 2, \"customer_facing\": 1, \"minute\": 64, \"region\": \"local\", \"title\": \"email-worker delay\"}, {\"id\": \"A-CDN-80\", \"service\": \"cdn-cache\", \"symptom\": \"stale\", \"severity\": 2, \"customer_facing\": 1, \"minute\": 80, \"region\": \"local\", \"title\": \"cdn-cache stale\"}, {\"id\": \"A-CDN-81\", \"service\": \"cdn-cache\", \"symptom\": \"stale\", \"severity\": 2, \"customer_facing\": 1, \"minute\": 82, \"region\": \"local\", \"title\": \"cdn-cache stale\"}, {\"id\": \"A-SEA-100\", \"service\": \"search-index\", \"symptom\": \"typo-regression\", \"severity\": 3, \"customer_facing\": 0, \"minute\": 100, \"region\": \"local\", \"title\": \"search-index typo-regression\"}, {\"id\": \"A-SEA-101\", \"service\": \"search-index\", \"symptom\": \"typo-regression\", \"severity\": 3, \"customer_facing\": 0, \"minute\": 102, \"region\": \"local\", \"title\": \"search-index typo-regression\"}, {\"id\": \"A-SEA-102\", \"service\": \"search-index\", \"symptom\": \"typo-regression\", \"severity\": 3, \"customer_facing\": 0, \"minute\": 104, \"region\": \"local\", \"title\": \"search-index typo-regression\"}, {\"id\": \"A-SEA-103\", \"service\": \"search-index\", \"symptom\": \"typo-regression\", \"severity\": 3, \"customer_facing\": 0, \"minute\": 106, \"region\": \"local\", \"title\": \"search-index typo-regression\"}, {\"id\": \"A-DOC-120\", \"service\": \"docs-site\", \"symptom\": \"404\", \"severity\": 4, \"customer_facing\": 0, \"minute\": 120, \"region\": \"local\", \"title\": \"docs-site 404\"}, {\"id\": \"A-DOC-121\", \"service\": \"docs-site\", \"symptom\": \"404\", \"severity\": 4, \"customer_facing\": 0, \"minute\": 122, \"region\": \"local\", \"title\": \"docs-site 404\"}, {\"id\": \"A-DOC-122\", \"service\": \"docs-site\", \"symptom\": \"404\", \"severity\": 4, \"customer_facing\": 0, \"minute\": 124, \"region\": \"local\", \"title\": \"docs-site 404\"}, {\"id\": \"A-BIL-140\", \"service\": \"billing-pdf\", \"symptom\": \"slow-render\", \"severity\": 3, \"customer_facing\": 0, \"minute\": 140, \"region\": \"local\", \"title\": \"billing-pdf slow-render\"}, {\"id\": \"A-BIL-141\", \"service\": \"billing-pdf\", \"symptom\": \"slow-render\", \"severity\": 3, \"customer_facing\": 0, \"minute\": 142, \"region\": \"local\", \"title\": \"billing-pdf slow-render\"}, {\"id\": \"A-BIL-142\", \"service\": \"billing-pdf\", \"symptom\": \"slow-render\", \"severity\": 3, \"customer_facing\": 0, \"minute\": 144, \"region\": \"local\", \"title\": \"billing-pdf slow-render\"}];\nconst groups = {};\nfor (const alert of alerts) {\n  const key = alert.service + \"|\" + alert.symptom;\n  if (!groups[key]) {\n    groups[key] = { ...alert, id: \"INC-\" + alert.service, alert_count: 0, first_minute: alert.minute, last_minute: alert.minute, title: alert.service + \" / \" + alert.symptom };\n  }\n  groups[key].alert_count += 1;\n  groups[key].first_minute = Math.min(groups[key].first_minute, alert.minute);\n  groups[key].last_minute = Math.max(groups[key].last_minute, alert.minute);\n  groups[key].severity = Math.min(groups[key].severity, alert.severity);\n}\nreturn Object.values(groups).map((incident) => {\n  const sev1 = incident.severity === 1 ? 1 : 0;\n  const customer = !sev1 && Number(incident.customer_facing) === 1 ? 1 : 0;\n  const internal = !sev1 && !customer ? 1 : 0;\n  let lane = \"internal\";\n  if (sev1) lane = \"sev1\";\n  else if (customer) lane = \"status\";\n  const duration = incident.last_minute - incident.first_minute + 2;\n  const action = {\n    sev1: \"Open the bridge, freeze deploys, and roll back the last change if the error budget is burning.\",\n    status: \"Draft a status note. No bridge unless it worsens to severity 1.\",\n    internal: \"File it. Do not page the customer owner.\"\n  }[lane];\n  return { json: { ...incident, sev1_flag: sev1, status_flag: customer, internal_flag: internal, lane, duration_minutes: duration, amount: duration, action } };\n});\n"
+      }
+    },
+    {
+      "id": "0acc76c5-1c56-46a3-8356-2272317b31c9",
+      "name": "Estimate Customer Impact",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1020,
+        220
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "\nconst rows = $input.all().map((item) => item.json);\nreturn rows.map((row) => {\n  const next = { ...row };\n\n  const weight = next.customer_facing ? (next.severity === 1 ? 40 : 12) : 0;\n  next.impact_score = weight * Number(next.alert_count);\n  next.customer_minutes = next.customer_facing ? Number(next.duration_minutes) * (next.severity === 1 ? 25 : 8) : 0;\n\n  return { json: next };\n});\n"
+      }
+    },
+    {
+      "id": "5cc92add-00ab-4899-8596-ca0d187fd035",
+      "name": "Incident Brief",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1360,
+        220
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "\nfunction fingerprint(value) {\n  const text = JSON.stringify(value);\n  let hash = 2166136261;\n  for (let i = 0; i < text.length; i++) {\n    hash ^= text.charCodeAt(i);\n    hash = Math.imul(hash, 16777619);\n  }\n  return (hash >>> 0).toString(16).padStart(8, \"0\");\n}\n\nconst rows = $input.all().map((item) => item.json);\nconst lanes = {};\nlet customerMinutes = 0;\nlet alerts = 0;\nfor (const row of rows) {\n  if (!lanes[row.lane]) lanes[row.lane] = { count: 0, amount: 0, samples: [] };\n  lanes[row.lane].count += 1;\n  lanes[row.lane].amount += Number(row.customer_minutes || 0);\n  alerts += Number(row.alert_count || 0);\n  customerMinutes += Number(row.customer_minutes || 0);\n  if (lanes[row.lane].samples.length < 3) lanes[row.lane].samples.push({ id: row.id, title: row.title, alerts: row.alert_count, action: row.action, customer_minutes: row.customer_minutes });\n}\nreturn [{ json: {\n  project: \"Incident Command and Postmortem\",\n  generated_at: new Date().toISOString(),\n  records: rows.length,\n  source_alerts: alerts,\n  lanes,\n  customer_minutes: customerMinutes,\n  fingerprint: fingerprint(rows.map((row) => [row.id, row.lane, row.alert_count])),\n  headline: alerts + \" alerts collapsed into \" + rows.length + \" incidents. Customer impact is an estimate from severity and duration, not a live status page.\"\n} }];\n"
+      }
+    },
+    {
+      "id": "c3c5e88f-9fa8-4aa9-93aa-e03b16a1dabf",
+      "name": "Severity 1?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1020,
+        580
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "a5ae603d-5540-4f3d-90fb-79eacedd6b9d",
+              "leftValue": "={{ $json.sev1_flag }}",
+              "rightValue": 1,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "0ab85ca7-7f7b-44bb-8769-2228a10c9038",
+      "name": "Open Bridge",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1360,
+        800
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "\nconst rows = $input.all().map((item) => item.json);\nreturn rows.map((row) => {\n  const next = { ...row };\n\n  next.desk = \"sev1\";\n  next.bridge = \"Bridge for \" + next.service + \". Freeze deploys. Owner: service on-call. First action: roll back the last change if the new error rate started after it.\";\n  next.runbook = [\"Confirm the symptom on the local dashboard\", \"Freeze deploys\", \"Roll back the last change\", \"Watch the error rate for 15 minutes\", \"Draft the customer note if users still see failures\"];\n\n  return { json: next };\n});\n"
+      }
+    },
+    {
+      "id": "2802d2e3-9b6e-4733-ab93-ccdcb5fb19b5",
+      "name": "Postmortem Stub",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1700,
+        800
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "\nconst rows = $input.all().map((item) => item.json);\nreturn rows.map((row) => {\n  const next = { ...row };\n\n  next.postmortem = {\n    incident: next.id,\n    summary: next.service + \" reported \" + next.symptom + \" across \" + next.alert_count + \" alerts.\",\n    impact: next.customer_minutes + \" estimated customer-minutes.\",\n    followups: [\"Add an alert that pages only after the third repeat\", \"Write the rollback as a one-page run card\"]\n  };\n\n  return { json: next };\n});\n"
+      }
+    },
+    {
+      "id": "e4b00b2f-a1e3-4086-8e58-0ed36a0924b1",
+      "name": "Customer Facing?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1360,
+        1120
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "389169f2-7fb4-40b7-af2b-3a0fff56bac9",
+              "leftValue": "={{ $json.status_flag }}",
+              "rightValue": 1,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "b34b4e60-dabb-4bed-afec-defbcf2b32be",
+      "name": "Status Draft",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1700,
+        1120
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "\nconst rows = $input.all().map((item) => item.json);\nreturn rows.map((row) => {\n  const next = { ...row };\n\n  next.desk = \"status\";\n  next.status_note = \"We are investigating slower \" + next.service + \" (\" + next.symptom + \"). Some customers may see a delay. We will update this note when the next scan is clean.\";\n\n  return { json: next };\n});\n"
+      }
+    },
+    {
+      "id": "b6160f00-40a0-4af3-ac2f-0d69d714d966",
+      "name": "Internal File",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1700,
+        1420
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "\nconst rows = $input.all().map((item) => item.json);\nreturn rows.map((row) => {\n  const next = { ...row };\n\n  next.desk = \"internal\";\n  next.file_note = next.service + \" / \" + next.symptom + \" stayed internal. No customer note.\";\n\n  return { json: next };\n});\n"
+      }
+    }
+  ],
+  "connections": {
+    "Run Incident Command": {
+      "main": [
+        [
+          {
+            "node": "Load Alert Stream",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load Alert Stream": {
+      "main": [
+        [
+          {
+            "node": "Correlate Into Incidents",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Correlate Into Incidents": {
+      "main": [
+        [
+          {
+            "node": "Estimate Customer Impact",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Estimate Customer Impact": {
+      "main": [
+        [
+          {
+            "node": "Incident Brief",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Severity 1?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Severity 1?": {
+      "main": [
+        [
+          {
+            "node": "Open Bridge",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Customer Facing?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Open Bridge": {
+      "main": [
+        [
+          {
+            "node": "Postmortem Stub",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Customer Facing?": {
+      "main": [
+        [
+          {
+            "node": "Status Draft",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Internal File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

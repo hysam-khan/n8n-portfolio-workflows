@@ -1,0 +1,456 @@
+{
+  "id": "RevReconcile0001",
+  "name": "Revenue Reconciliation and Leak Audit",
+  "description": "Match a local invoice book to payments, refunds, and chargebacks. Age the open items and separate leaks, collections, overpayments, and cleared cash.",
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "nodes": [
+    {
+      "id": "ad24bb50-d1ea-4b25-8f2e-a3f2c79acafd",
+      "name": "## Books",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        -260
+      ],
+      "parameters": {
+        "content": "## Books\nEach row is an invoice plus the cash, refunds, and chargebacks applied to it. This is a closed sample, not a live ledger.",
+        "height": 200,
+        "width": 720,
+        "color": 5
+      }
+    },
+    {
+      "id": "1cbd335a-9b26-4f65-af2e-ab46e8fb91b5",
+      "name": "## Lanes",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        -260
+      ],
+      "parameters": {
+        "content": "## Lanes\nChargeback, overpaid, collections (open and older than 45 days), still-open, and cleared.",
+        "height": 200,
+        "width": 700,
+        "color": 6
+      }
+    },
+    {
+      "id": "bf409eaf-5001-47f5-addd-4cf6bb96b6cd",
+      "name": "Run Reconciliation",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        200
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "f1d3155f-0e31-4bf0-b17d-6cfc2950e313",
+      "name": "Load Invoice Book",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        320,
+        200
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const books = [{\"id\": \"INV-501\", \"customer\": \"Aster Mail\", \"amount\": 1200, \"payment\": 1200, \"refund\": 0, \"chargeback\": 0, \"age_days\": 12, \"title\": \"Aster Mail\"}, {\"id\": \"INV-502\", \"customer\": \"Birch Counter\", \"amount\": 860, \"payment\": 860, \"refund\": 0, \"chargeback\": 0, \"age_days\": 6, \"title\": \"Birch Counter\"}, {\"id\": \"INV-503\", \"customer\": \"Cobalt Till\", \"amount\": 440, \"payment\": 440, \"refund\": 0, \"chargeback\": 0, \"age_days\": 21, \"title\": \"Cobalt Till\"}, {\"id\": \"INV-504\", \"customer\": \"Dune Register\", \"amount\": 2100, \"payment\": 2100, \"refund\": 0, \"chargeback\": 0, \"age_days\": 4, \"title\": \"Dune Register\"}, {\"id\": \"INV-505\", \"customer\": \"Elm Kiosk\", \"amount\": 310, \"payment\": 310, \"refund\": 40, \"chargeback\": 0, \"age_days\": 18, \"title\": \"Elm Kiosk\"}, {\"id\": \"INV-506\", \"customer\": \"Fern Window\", \"amount\": 980, \"payment\": 980, \"refund\": 0, \"chargeback\": 0, \"age_days\": 9, \"title\": \"Fern Window\"}, {\"id\": \"INV-507\", \"customer\": \"Gilt Counter\", \"amount\": 150, \"payment\": 150, \"refund\": 0, \"chargeback\": 0, \"age_days\": 30, \"title\": \"Gilt Counter\"}, {\"id\": \"INV-508\", \"customer\": \"Harbor Thread\", \"amount\": 760, \"payment\": 760, \"refund\": 0, \"chargeback\": 0, \"age_days\": 14, \"title\": \"Harbor Thread\"}, {\"id\": \"INV-509\", \"customer\": \"Iona Market\", \"amount\": 540, \"payment\": 540, \"refund\": 0, \"chargeback\": 0, \"age_days\": 2, \"title\": \"Iona Market\"}, {\"id\": \"INV-510\", \"customer\": \"Quiet Lamp\", \"amount\": 1280, \"payment\": 1280, \"refund\": 0, \"chargeback\": 0, \"age_days\": 11, \"title\": \"Quiet Lamp\"}, {\"id\": \"INV-511\", \"customer\": \"Lumen Paper\", \"amount\": 400, \"payment\": 250, \"refund\": 0, \"chargeback\": 0, \"age_days\": 12, \"title\": \"Lumen Paper\"}, {\"id\": \"INV-512\", \"customer\": \"Kite Postal\", \"amount\": 900, \"payment\": 400, \"refund\": 0, \"chargeback\": 0, \"age_days\": 20, \"title\": \"Kite Postal\"}, {\"id\": \"INV-513\", \"customer\": \"Moth and Pine\", \"amount\": 650, \"payment\": 100, \"refund\": 0, \"chargeback\": 0, \"age_days\": 33, \"title\": \"Moth and Pine\"}, {\"id\": \"INV-514\", \"customer\": \"Nimble Jar\", \"amount\": 2200, \"payment\": 500, \"refund\": 0, \"chargeback\": 0, \"age_days\": 50, \"title\": \"Nimble Jar\"}, {\"id\": \"INV-515\", \"customer\": \"Olive Press\", \"amount\": 1750, \"payment\": 0, \"refund\": 0, \"chargeback\": 0, \"age_days\": 61, \"title\": \"Olive Press\"}, {\"id\": \"INV-516\", \"customer\": \"Pell and Loom\", \"amount\": 980, \"payment\": 200, \"refund\": 0, \"chargeback\": 0, \"age_days\": 70, \"title\": \"Pell and Loom\"}, {\"id\": \"INV-517\", \"customer\": \"Red Docket\", \"amount\": 640, \"payment\": 0, \"refund\": 0, \"chargeback\": 0, \"age_days\": 80, \"title\": \"Red Docket\"}, {\"id\": \"INV-518\", \"customer\": \"Salt Atelier\", \"amount\": 430, \"payment\": 430, \"refund\": 0, \"chargeback\": 430, \"age_days\": 22, \"title\": \"Salt Atelier\"}, {\"id\": \"INV-519\", \"customer\": \"Tin Wharf\", \"amount\": 890, \"payment\": 890, \"refund\": 0, \"chargeback\": 890, \"age_days\": 16, \"title\": \"Tin Wharf\"}, {\"id\": \"INV-520\", \"customer\": \"Umber Line\", \"amount\": 1500, \"payment\": 1500, \"refund\": 0, \"chargeback\": 600, \"age_days\": 27, \"title\": \"Umber Line\"}, {\"id\": \"INV-521\", \"customer\": \"Violet Rack\", \"amount\": 300, \"payment\": 450, \"refund\": 0, \"chargeback\": 0, \"age_days\": 8, \"title\": \"Violet Rack\"}, {\"id\": \"INV-522\", \"customer\": \"Willow Bin\", \"amount\": 720, \"payment\": 900, \"refund\": 0, \"chargeback\": 0, \"age_days\": 15, \"title\": \"Willow Bin\"}, {\"id\": \"INV-523\", \"customer\": \"Yellow Kiln\", \"amount\": 260, \"payment\": 500, \"refund\": 20, \"chargeback\": 0, \"age_days\": 19, \"title\": \"Yellow Kiln\"}, {\"id\": \"INV-524\", \"customer\": \"Zinc Cooperative\", \"amount\": 1100, \"payment\": 1100, \"refund\": 0, \"chargeback\": 0, \"age_days\": 7, \"title\": \"Zinc Cooperative\"}, {\"id\": \"INV-525\", \"customer\": \"Alder Freight\", \"amount\": 480, \"payment\": 480, \"refund\": 0, \"chargeback\": 0, \"age_days\": 25, \"title\": \"Alder Freight\"}, {\"id\": \"INV-526\", \"customer\": \"Cedar Batch\", \"amount\": 670, \"payment\": 0, \"refund\": 0, \"chargeback\": 0, \"age_days\": 15, \"title\": \"Cedar Batch\"}];\nreturn books.map((row) => ({ json: row }));"
+      }
+    },
+    {
+      "id": "a09a0def-5caf-4930-b7b5-ceae3a2023b0",
+      "name": "Normalize Money",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        640,
+        200
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "\nconst rows = $input.all().map((item) => item.json);\nreturn rows.map((row) => {\n  const next = { ...row };\n\n  next.amount = Math.round(Number(next.amount) * 100) / 100;\n  next.payment = Math.round(Number(next.payment || 0) * 100) / 100;\n  next.refund = Math.round(Number(next.refund || 0) * 100) / 100;\n  next.chargeback = Math.round(Number(next.chargeback || 0) * 100) / 100;\n  next.net_paid = Math.round((next.payment - next.refund - next.chargeback) * 100) / 100;\n  next.gap = Math.round((next.amount - next.net_paid) * 100) / 100;\n\n  return { json: next };\n});\n"
+      }
+    },
+    {
+      "id": "5178e269-9296-4122-8fff-c36db6995492",
+      "name": "Match Cash To Invoices",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        960,
+        200
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "\nconst rows = $input.all().map((item) => item.json);\nreturn rows.map((row) => {\n\n  const gap = Number(row.gap);\n  const chargebackFlag = Number(row.chargeback) > 0 ? 1 : 0;\n  const overpaidFlag = !chargebackFlag && gap < -0.01 ? 1 : 0;\n  const openFlag = !chargebackFlag && !overpaidFlag && gap > 0.01 ? 1 : 0;\n  const collectionsFlag = openFlag && Number(row.age_days) > 45 ? 1 : 0;\n  const stillOpenFlag = openFlag && !collectionsFlag ? 1 : 0;\n  const clearedFlag = !chargebackFlag && !overpaidFlag && !openFlag ? 1 : 0;\n  let lane = \"cleared\";\n  if (chargebackFlag) lane = \"chargeback\";\n  else if (overpaidFlag) lane = \"overpaid\";\n  else if (collectionsFlag) lane = \"collections\";\n  else if (stillOpenFlag) lane = \"open\";\n  const action = {\n    chargeback: \"Open a representment file and freeze the related payout.\",\n    overpaid: \"Refund the extra cash or leave it as customer credit, and say which.\",\n    collections: \"Send the aged balance to collections with the invoice and the last payment.\",\n    open: \"Send a reminder. The balance is still inside terms.\",\n    cleared: \"File the invoice as matched. No cash action.\"\n  }[lane];\n  return { json: { ...row, chargeback_flag: chargebackFlag, overpaid_flag: overpaidFlag, collections_flag: collectionsFlag, open_flag: stillOpenFlag, cleared_flag: clearedFlag, lane, action, title: row.customer } };\n\n});\n"
+      }
+    },
+    {
+      "id": "581d558f-b93a-494a-a2b1-363ae2b88348",
+      "name": "Bucket Aging",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1280,
+        200
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "\nconst rows = $input.all().map((item) => item.json);\nreturn rows.map((row) => {\n  const next = { ...row };\n\n  const age = Number(next.age_days);\n  next.aging_bucket = age <= 30 ? \"0-30\" : age <= 45 ? \"31-45\" : age <= 60 ? \"46-60\" : \"61+\";\n\n  return { json: next };\n});\n"
+      }
+    },
+    {
+      "id": "7c750708-145c-4eeb-b1a0-73ce87e78ae2",
+      "name": "Controller Pack",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1600,
+        200
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "\nfunction fingerprint(value) {\n  const text = JSON.stringify(value);\n  let hash = 2166136261;\n  for (let i = 0; i < text.length; i++) {\n    hash ^= text.charCodeAt(i);\n    hash = Math.imul(hash, 16777619);\n  }\n  return (hash >>> 0).toString(16).padStart(8, \"0\");\n}\n\nconst rows = $input.all().map((item) => item.json);\nconst lanes = {};\nfor (const row of rows) {\n  if (!lanes[row.lane]) lanes[row.lane] = { count: 0, amount: 0, gap: 0, samples: [] };\n  lanes[row.lane].count += 1;\n  lanes[row.lane].amount = Math.round((lanes[row.lane].amount + Number(row.amount)) * 100) / 100;\n  lanes[row.lane].gap = Math.round((lanes[row.lane].gap + Number(row.gap)) * 100) / 100;\n  if (lanes[row.lane].samples.length < 3) lanes[row.lane].samples.push({ id: row.id, customer: row.customer, gap: row.gap, age_days: row.age_days, action: row.action });\n}\nconst leakage = Math.round(rows.filter((row) => row.lane === \"chargeback\" || row.lane === \"collections\").reduce((sum, row) => sum + Math.max(0, Number(row.gap)), 0) * 100) / 100;\nreturn [{ json: {\n  project: \"Revenue Reconciliation and Leak Audit\",\n  generated_at: new Date().toISOString(),\n  records: rows.length,\n  lanes,\n  leakage_gap: leakage,\n  fingerprint: fingerprint(rows.map((row) => [row.id, row.lane, row.gap])),\n  headline: rows.length + \" invoices matched locally. Leakage is the chargeback and aged-collection gap.\"\n} }];\n"
+      }
+    },
+    {
+      "id": "326b1a22-14e7-404b-a775-b40075f8fd8f",
+      "name": "Chargeback?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1280,
+        560
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "3210c2f0-9dc8-4e08-b9fa-21c701e76cfd",
+              "leftValue": "={{ $json.chargeback_flag }}",
+              "rightValue": 1,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "4f782a72-778b-42b1-9139-d79cb13c7f4d",
+      "name": "Chargeback File",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1600,
+        780
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "\nconst rows = $input.all().map((item) => item.json);\nreturn rows.map((row) => {\n  const next = { ...row };\n  next.desk = \"chargeback\";\n  next.file = \"CB-\" + next.id + \" amount \" + next.chargeback;\n  return { json: next };\n});\n"
+      }
+    },
+    {
+      "id": "419d0267-c333-40ec-9538-fb9f4ba85da5",
+      "name": "Overpaid?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1600,
+        560
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "6bef49f6-c53e-4786-bd05-091b81c17b81",
+              "leftValue": "={{ $json.overpaid_flag }}",
+              "rightValue": 1,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "11dea19c-d1ee-4e9b-9644-d69398a79fdc",
+      "name": "Credit Desk",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1920,
+        860
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "\nconst rows = $input.all().map((item) => item.json);\nreturn rows.map((row) => {\n  const next = { ...row };\n  next.desk = \"overpaid\";\n  next.credit = Math.abs(Number(next.gap));\n  return { json: next };\n});\n"
+      }
+    },
+    {
+      "id": "27798b02-b679-427e-8e98-c6cfc241f60e",
+      "name": "Collections?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1920,
+        560
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "85c863e0-259e-4ad1-a473-298ad5dc92c7",
+              "leftValue": "={{ $json.collections_flag }}",
+              "rightValue": 1,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "21fbe435-8bb7-4bf9-af4e-126e65483a65",
+      "name": "Collections Desk",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2240,
+        740
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "\nconst rows = $input.all().map((item) => item.json);\nreturn rows.map((row) => {\n  const next = { ...row };\n  next.desk = \"collections\";\n  next.dossier = next.id + \" is \" + next.age_days + \" days old with \" + next.gap + \" still open.\";\n  return { json: next };\n});\n"
+      }
+    },
+    {
+      "id": "f975371c-597c-4899-ad91-4b9621eb2cc0",
+      "name": "Still Open?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2240,
+        560
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "3db461ee-8b5b-406e-8619-ce79e6624180",
+              "leftValue": "={{ $json.open_flag }}",
+              "rightValue": 1,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "2d2ef812-bdf1-424a-b6d6-d56054945fa5",
+      "name": "Reminder Desk",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2560,
+        740
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "\nconst rows = $input.all().map((item) => item.json);\nreturn rows.map((row) => {\n  const next = { ...row };\n  next.desk = \"open\";\n  next.reminder = \"Balance \" + next.gap + \" on \" + next.id + \", bucket \" + next.aging_bucket + \".\";\n  return { json: next };\n});\n"
+      }
+    },
+    {
+      "id": "143a5b06-0b51-49b5-9506-c34245a7db12",
+      "name": "Cleared Ledger",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2560,
+        1040
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "\nconst rows = $input.all().map((item) => item.json);\nreturn rows.map((row) => {\n  const next = { ...row };\n  next.desk = \"cleared\";\n  next.stamp = \"matched\";\n  return { json: next };\n});\n"
+      }
+    }
+  ],
+  "connections": {
+    "Run Reconciliation": {
+      "main": [
+        [
+          {
+            "node": "Load Invoice Book",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load Invoice Book": {
+      "main": [
+        [
+          {
+            "node": "Normalize Money",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Money": {
+      "main": [
+        [
+          {
+            "node": "Match Cash To Invoices",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Match Cash To Invoices": {
+      "main": [
+        [
+          {
+            "node": "Bucket Aging",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bucket Aging": {
+      "main": [
+        [
+          {
+            "node": "Controller Pack",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Chargeback?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chargeback?": {
+      "main": [
+        [
+          {
+            "node": "Chargeback File",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Overpaid?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Overpaid?": {
+      "main": [
+        [
+          {
+            "node": "Credit Desk",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Collections?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collections?": {
+      "main": [
+        [
+          {
+            "node": "Collections Desk",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Still Open?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Still Open?": {
+      "main": [
+        [
+          {
+            "node": "Reminder Desk",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Cleared Ledger",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

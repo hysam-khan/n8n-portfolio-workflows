@@ -1,0 +1,636 @@
+{
+  "id": "OrderCmdCenter01",
+  "name": "Order Command Center",
+  "description": "Local order desk: validate, score fraud and margin, then route quarantine, rejection, review, backorder, parcel, and pickup. Sample data only.",
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "nodes": [
+    {
+      "id": "3c361ca9-0b1e-4ffe-aab5-b4d06ff01c5a",
+      "name": "## 1. Intake",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        -280
+      ],
+      "parameters": {
+        "content": "## 1. Intake\nSample order book. No store API and no payment gateway. The manual trigger is the local run button.",
+        "height": 200,
+        "width": 700,
+        "color": 4
+      }
+    },
+    {
+      "id": "0b01760b-dbc9-40f5-a8d3-59daaa5b0818",
+      "name": "## 2. Risk and margin",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        900,
+        -280
+      ],
+      "parameters": {
+        "content": "## 2. Risk and margin\nFraud points: country mismatch, card mismatch, new account, velocity, and a high gross. Margin under 12% or gross over 1500 goes to review.",
+        "height": 220,
+        "width": 760,
+        "color": 6
+      }
+    },
+    {
+      "id": "4c26cd70-2ae0-40ea-801d-1c8f09acb223",
+      "name": "## 3. Desks",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1680,
+        -280
+      ],
+      "parameters": {
+        "content": "## 3. Desks\nInvalid orders never reach stock. Rejections, reviews, backorders, parcels, and pickups each finish on their own desk.",
+        "height": 220,
+        "width": 780,
+        "color": 3
+      }
+    },
+    {
+      "id": "6c07a344-8f27-4138-b7f9-bba359a22bb9",
+      "name": "Run Order Command",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        180
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "32d19bd9-d994-4974-9a63-3e04c9f35c9e",
+      "name": "Load Order Book",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        300,
+        180
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const orders = [{\"id\": \"ORD-1001\", \"customer\": \"\", \"sku\": \"BRS-MUG\", \"qty\": 1, \"unit_price\": 80, \"margin\": 0.34, \"billing\": \"US\", \"ship\": \"US\", \"card\": \"US\", \"new_customer\": 0, \"velocity_1h\": 1, \"mode\": \"parcel\", \"stock\": 40, \"tax_rate\": 0.08, \"title\": \"Blank customer\"}, {\"id\": \"ORD-1002\", \"customer\": \"Pell & Loom\", \"sku\": \"\", \"qty\": 1, \"unit_price\": 80, \"margin\": 0.34, \"billing\": \"US\", \"ship\": \"US\", \"card\": \"US\", \"new_customer\": 0, \"velocity_1h\": 1, \"mode\": \"parcel\", \"stock\": 40, \"tax_rate\": 0.08, \"title\": \"Missing SKU\"}, {\"id\": \"ORD-1003\", \"customer\": \"North Glass\", \"sku\": \"BRS-MUG\", \"qty\": 0, \"unit_price\": 80, \"margin\": 0.34, \"billing\": \"US\", \"ship\": \"US\", \"card\": \"US\", \"new_customer\": 0, \"velocity_1h\": 1, \"mode\": \"parcel\", \"stock\": 40, \"tax_rate\": 0.08, \"title\": \"Zero quantity\"}, {\"id\": \"ORD-1004\", \"customer\": \"Kindling Co\", \"sku\": \"BRS-MUG\", \"qty\": 1, \"unit_price\": -5, \"margin\": 0.34, \"billing\": \"US\", \"ship\": \"US\", \"card\": \"US\", \"new_customer\": 0, \"velocity_1h\": 1, \"mode\": \"parcel\", \"stock\": 40, \"tax_rate\": 0.08, \"title\": \"Negative price\"}, {\"id\": \"ORD-1005\", \"customer\": \"Veldt Supply\", \"sku\": \"BRS-MUG\", \"qty\": 2, \"unit_price\": 420, \"margin\": 0.34, \"billing\": \"US\", \"ship\": \"DE\", \"card\": \"GB\", \"new_customer\": 0, \"velocity_1h\": 5, \"mode\": \"parcel\", \"stock\": 40, \"tax_rate\": 0.08, \"title\": \"Cross-border burst\"}, {\"id\": \"ORD-1006\", \"customer\": \"Iona Market\", \"sku\": \"BRS-MUG\", \"qty\": 3, \"unit_price\": 900, \"margin\": 0.34, \"billing\": \"US\", \"ship\": \"FR\", \"card\": \"SG\", \"new_customer\": 1, \"velocity_1h\": 6, \"mode\": \"parcel\", \"stock\": 40, \"tax_rate\": 0.08, \"title\": \"New account burst\"}, {\"id\": \"ORD-1007\", \"customer\": \"Cairn Goods\", \"sku\": \"BRS-MUG\", \"qty\": 2, \"unit_price\": 640, \"margin\": 0.34, \"billing\": \"CA\", \"ship\": \"US\", \"card\": \"BR\", \"new_customer\": 0, \"velocity_1h\": 4, \"mode\": \"parcel\", \"stock\": 40, \"tax_rate\": 0.08, \"title\": \"Card country mismatch\"}, {\"id\": \"ORD-1008\", \"customer\": \"Moth & Pine\", \"sku\": \"BRS-MUG\", \"qty\": 1, \"unit_price\": 300, \"margin\": 0.34, \"billing\": \"US\", \"ship\": \"JP\", \"card\": \"US\", \"new_customer\": 0, \"velocity_1h\": 5, \"mode\": \"parcel\", \"stock\": 40, \"tax_rate\": 0.08, \"title\": \"Velocity plus border\"}, {\"id\": \"ORD-1009\", \"customer\": \"Sable Post\", \"sku\": \"BRS-MUG\", \"qty\": 2, \"unit_price\": 250, \"margin\": 0.34, \"billing\": \"GB\", \"ship\": \"US\", \"card\": \"NG\", \"new_customer\": 1, \"velocity_1h\": 4, \"mode\": \"parcel\", \"stock\": 40, \"tax_rate\": 0.08, \"title\": \"Stacked fraud signals\"}, {\"id\": \"ORD-1010\", \"customer\": \"Harbor Thread\", \"sku\": \"BRS-MUG\", \"qty\": 1, \"unit_price\": 90, \"margin\": 0.34, \"billing\": \"US\", \"ship\": \"DE\", \"card\": \"US\", \"new_customer\": 1, \"velocity_1h\": 1, \"mode\": \"parcel\", \"stock\": 40, \"tax_rate\": 0.08, \"title\": \"Border and new account\"}, {\"id\": \"ORD-1011\", \"customer\": \"Lumen Paper\", \"sku\": \"BRS-MUG\", \"qty\": 2, \"unit_price\": 140, \"margin\": 0.05, \"billing\": \"US\", \"ship\": \"US\", \"card\": \"US\", \"new_customer\": 0, \"velocity_1h\": 1, \"mode\": \"parcel\", \"stock\": 40, \"tax_rate\": 0.08, \"title\": \"Thin margin\"}, {\"id\": \"ORD-1012\", \"customer\": \"Kite Postal\", \"sku\": \"BRS-MUG\", \"qty\": 1, \"unit_price\": 220, \"margin\": 0.08, \"billing\": \"US\", \"ship\": \"US\", \"card\": \"US\", \"new_customer\": 0, \"velocity_1h\": 1, \"mode\": \"parcel\", \"stock\": 40, \"tax_rate\": 0.08, \"title\": \"Margin under floor\"}, {\"id\": \"ORD-1013\", \"customer\": \"Brass Foundry\", \"sku\": \"BRS-MUG\", \"qty\": 1, \"unit_price\": 1800, \"margin\": 0.4, \"billing\": \"US\", \"ship\": \"US\", \"card\": \"US\", \"new_customer\": 0, \"velocity_1h\": 1, \"mode\": \"parcel\", \"stock\": 40, \"tax_rate\": 0.08, \"title\": \"High gross review\"}, {\"id\": \"ORD-1014\", \"customer\": \"Wren Studio\", \"sku\": \"BRS-MUG\", \"qty\": 1, \"unit_price\": 110, \"margin\": 0.34, \"billing\": \"US\", \"ship\": \"CA\", \"card\": \"US\", \"new_customer\": 0, \"velocity_1h\": 1, \"mode\": \"parcel\", \"stock\": 40, \"tax_rate\": 0.08, \"title\": \"Mild border risk\"}, {\"id\": \"ORD-1015\", \"customer\": \"Ochre Home\", \"sku\": \"BRS-MUG\", \"qty\": 4, \"unit_price\": 75, \"margin\": 0.09, \"billing\": \"US\", \"ship\": \"US\", \"card\": \"US\", \"new_customer\": 0, \"velocity_1h\": 1, \"mode\": \"parcel\", \"stock\": 40, \"tax_rate\": 0.08, \"title\": \"Discount leak\"}, {\"id\": \"ORD-1016\", \"customer\": \"Field Radio\", \"sku\": \"BRS-MUG\", \"qty\": 1, \"unit_price\": 60, \"margin\": 0.34, \"billing\": \"US\", \"ship\": \"MX\", \"card\": \"US\", \"new_customer\": 1, \"velocity_1h\": 1, \"mode\": \"parcel\", \"stock\": 40, \"tax_rate\": 0.08, \"title\": \"New cross-border\"}, {\"id\": \"ORD-1017\", \"customer\": \"Aster Mail\", \"sku\": \"BRS-MUG\", \"qty\": 1, \"unit_price\": 1600, \"margin\": 0.34, \"billing\": \"US\", \"ship\": \"US\", \"card\": \"US\", \"new_customer\": 0, \"velocity_1h\": 1, \"mode\": \"parcel\", \"stock\": 40, \"tax_rate\": 0.08, \"title\": \"Large but clean\"}, {\"id\": \"ORD-1100\", \"customer\": \"Cedar Batch\", \"sku\": \"BRS-MUG\", \"qty\": 2, \"unit_price\": 90, \"margin\": 0.34, \"billing\": \"US\", \"ship\": \"US\", \"card\": \"US\", \"new_customer\": 0, \"velocity_1h\": 1, \"mode\": \"parcel\", \"stock\": 40, \"tax_rate\": 0.08, \"title\": \"Cedar Batch\"}, {\"id\": \"ORD-1101\", \"customer\": \"Nimble Jar\", \"sku\": \"BRS-MUG\", \"qty\": 2, \"unit_price\": 97, \"margin\": 0.34, \"billing\": \"US\", \"ship\": \"US\", \"card\": \"US\", \"new_customer\": 0, \"velocity_1h\": 1, \"mode\": \"parcel\", \"stock\": 40, \"tax_rate\": 0.08, \"title\": \"Nimble Jar\"}, {\"id\": \"ORD-1102\", \"customer\": \"Olive Press\", \"sku\": \"BRS-MUG\", \"qty\": 2, \"unit_price\": 104, \"margin\": 0.34, \"billing\": \"US\", \"ship\": \"US\", \"card\": \"US\", \"new_customer\": 0, \"velocity_1h\": 1, \"mode\": \"parcel\", \"stock\": 40, \"tax_rate\": 0.08, \"title\": \"Olive Press\"}, {\"id\": \"ORD-1103\", \"customer\": \"Quiet Lamp\", \"sku\": \"BRS-MUG\", \"qty\": 2, \"unit_price\": 111, \"margin\": 0.34, \"billing\": \"US\", \"ship\": \"US\", \"card\": \"US\", \"new_customer\": 0, \"velocity_1h\": 1, \"mode\": \"parcel\", \"stock\": 40, \"tax_rate\": 0.08, \"title\": \"Quiet Lamp\"}, {\"id\": \"ORD-1104\", \"customer\": \"Red Docket\", \"sku\": \"BRS-MUG\", \"qty\": 2, \"unit_price\": 118, \"margin\": 0.34, \"billing\": \"US\", \"ship\": \"US\", \"card\": \"US\", \"new_customer\": 0, \"velocity_1h\": 1, \"mode\": \"parcel\", \"stock\": 40, \"tax_rate\": 0.08, \"title\": \"Red Docket\"}, {\"id\": \"ORD-1105\", \"customer\": \"Salt Atelier\", \"sku\": \"BRS-MUG\", \"qty\": 2, \"unit_price\": 125, \"margin\": 0.34, \"billing\": \"US\", \"ship\": \"US\", \"card\": \"US\", \"new_customer\": 0, \"velocity_1h\": 1, \"mode\": \"parcel\", \"stock\": 40, \"tax_rate\": 0.08, \"title\": \"Salt Atelier\"}, {\"id\": \"ORD-1106\", \"customer\": \"Tin Wharf\", \"sku\": \"BRS-MUG\", \"qty\": 2, \"unit_price\": 132, \"margin\": 0.34, \"billing\": \"US\", \"ship\": \"US\", \"card\": \"US\", \"new_customer\": 0, \"velocity_1h\": 1, \"mode\": \"parcel\", \"stock\": 40, \"tax_rate\": 0.08, \"title\": \"Tin Wharf\"}, {\"id\": \"ORD-1107\", \"customer\": \"Umber Line\", \"sku\": \"BRS-MUG\", \"qty\": 2, \"unit_price\": 139, \"margin\": 0.34, \"billing\": \"US\", \"ship\": \"US\", \"card\": \"US\", \"new_customer\": 0, \"velocity_1h\": 1, \"mode\": \"parcel\", \"stock\": 40, \"tax_rate\": 0.08, \"title\": \"Umber Line\"}, {\"id\": \"ORD-1108\", \"customer\": \"Violet Rack\", \"sku\": \"BRS-MUG\", \"qty\": 2, \"unit_price\": 146, \"margin\": 0.34, \"billing\": \"US\", \"ship\": \"US\", \"card\": \"US\", \"new_customer\": 0, \"velocity_1h\": 1, \"mode\": \"parcel\", \"stock\": 40, \"tax_rate\": 0.08, \"title\": \"Violet Rack\"}, {\"id\": \"ORD-1109\", \"customer\": \"Willow Bin\", \"sku\": \"BRS-MUG\", \"qty\": 2, \"unit_price\": 153, \"margin\": 0.34, \"billing\": \"US\", \"ship\": \"US\", \"card\": \"US\", \"new_customer\": 0, \"velocity_1h\": 1, \"mode\": \"parcel\", \"stock\": 40, \"tax_rate\": 0.08, \"title\": \"Willow Bin\"}, {\"id\": \"ORD-1201\", \"customer\": \"Yellow Kiln\", \"sku\": \"BRS-MUG\", \"qty\": 6, \"unit_price\": 70, \"margin\": 0.34, \"billing\": \"US\", \"ship\": \"US\", \"card\": \"US\", \"new_customer\": 0, \"velocity_1h\": 1, \"mode\": \"parcel\", \"stock\": 2, \"tax_rate\": 0.08, \"title\": \"Mug backorder\"}, {\"id\": \"ORD-1202\", \"customer\": \"Zinc Cooperative\", \"sku\": \"BRS-MUG\", \"qty\": 4, \"unit_price\": 110, \"margin\": 0.34, \"billing\": \"US\", \"ship\": \"US\", \"card\": \"US\", \"new_customer\": 0, \"velocity_1h\": 1, \"mode\": \"parcel\", \"stock\": 1, \"tax_rate\": 0.08, \"title\": \"Lamp backorder\"}, {\"id\": \"ORD-1203\", \"customer\": \"Alder Freight\", \"sku\": \"BRS-MUG\", \"qty\": 8, \"unit_price\": 55, \"margin\": 0.34, \"billing\": \"US\", \"ship\": \"US\", \"card\": \"US\", \"new_customer\": 0, \"velocity_1h\": 1, \"mode\": \"parcel\", \"stock\": 3, \"tax_rate\": 0.08, \"title\": \"Bin backorder\"}, {\"id\": \"ORD-1300\", \"customer\": \"Birch Counter\", \"sku\": \"BRS-MUG\", \"qty\": 1, \"unit_price\": 65, \"margin\": 0.34, \"billing\": \"US\", \"ship\": \"US\", \"card\": \"US\", \"new_customer\": 0, \"velocity_1h\": 1, \"mode\": \"pickup\", \"stock\": 10, \"tax_rate\": 0.08, \"title\": \"Birch Counter\"}, {\"id\": \"ORD-1301\", \"customer\": \"Cobalt Till\", \"sku\": \"BRS-MUG\", \"qty\": 1, \"unit_price\": 74, \"margin\": 0.34, \"billing\": \"US\", \"ship\": \"US\", \"card\": \"US\", \"new_customer\": 0, \"velocity_1h\": 1, \"mode\": \"pickup\", \"stock\": 10, \"tax_rate\": 0.08, \"title\": \"Cobalt Till\"}, {\"id\": \"ORD-1302\", \"customer\": \"Dune Register\", \"sku\": \"BRS-MUG\", \"qty\": 1, \"unit_price\": 83, \"margin\": 0.34, \"billing\": \"US\", \"ship\": \"US\", \"card\": \"US\", \"new_customer\": 0, \"velocity_1h\": 1, \"mode\": \"pickup\", \"stock\": 10, \"tax_rate\": 0.08, \"title\": \"Dune Register\"}, {\"id\": \"ORD-1303\", \"customer\": \"Elm Kiosk\", \"sku\": \"BRS-MUG\", \"qty\": 1, \"unit_price\": 92, \"margin\": 0.34, \"billing\": \"US\", \"ship\": \"US\", \"card\": \"US\", \"new_customer\": 0, \"velocity_1h\": 1, \"mode\": \"pickup\", \"stock\": 10, \"tax_rate\": 0.08, \"title\": \"Elm Kiosk\"}, {\"id\": \"ORD-1304\", \"customer\": \"Fern Window\", \"sku\": \"BRS-MUG\", \"qty\": 1, \"unit_price\": 101, \"margin\": 0.34, \"billing\": \"US\", \"ship\": \"US\", \"card\": \"US\", \"new_customer\": 0, \"velocity_1h\": 1, \"mode\": \"pickup\", \"stock\": 10, \"tax_rate\": 0.08, \"title\": \"Fern Window\"}, {\"id\": \"ORD-1305\", \"customer\": \"Gilt Counter\", \"sku\": \"BRS-MUG\", \"qty\": 1, \"unit_price\": 110, \"margin\": 0.34, \"billing\": \"US\", \"ship\": \"US\", \"card\": \"US\", \"new_customer\": 0, \"velocity_1h\": 1, \"mode\": \"pickup\", \"stock\": 10, \"tax_rate\": 0.08, \"title\": \"Gilt Counter\"}];\nreturn orders.map((order) => ({ json: order }));"
+      }
+    },
+    {
+      "id": "6cb8a808-d4a8-4eb7-b608-682a8696fef6",
+      "name": "Normalize Orders",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        620,
+        180
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "\nconst rows = $input.all().map((item) => item.json);\nreturn rows.map((row) => {\n\n  const problems = [];\n  if (!row.customer) problems.push(\"missing_customer\");\n  if (!row.sku) problems.push(\"missing_sku\");\n  if (!(Number(row.qty) > 0)) problems.push(\"bad_qty\");\n  if (!(Number(row.unit_price) > 0)) problems.push(\"bad_price\");\n  const qty = Number(row.qty) || 0;\n  const unitPrice = Number(row.unit_price) || 0;\n  const validFlag = problems.length ? 0 : 1;\n  const net = validFlag ? Math.round(qty * unitPrice * 100) / 100 : 0;\n  return { json: { ...row, qty, unit_price: unitPrice, problems, valid_flag: validFlag, net } };\n\n});\n"
+      }
+    },
+    {
+      "id": "73e0b82b-ef79-4a1e-a167-0a1e715fe2fc",
+      "name": "Assign Customer Tier",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        940,
+        180
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "\nconst rows = $input.all().map((item) => item.json);\nreturn rows.map((row) => {\n  const next = { ...row };\n\n  next.tier = next.net >= 800 ? \"gold\" : next.net >= 250 ? \"silver\" : \"standard\";\n\n  return { json: next };\n});\n"
+      }
+    },
+    {
+      "id": "a80ae7d4-84c7-422a-88f5-cdbc6a68f99e",
+      "name": "Calculate Tax",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1260,
+        180
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "\nconst rows = $input.all().map((item) => item.json);\nreturn rows.map((row) => {\n  const next = { ...row };\n\n  const tax = next.valid_flag ? Math.round(next.net * Number(next.tax_rate || 0) * 100) / 100 : 0;\n  next.tax = tax;\n  next.gross = Math.round((Number(next.net || 0) + tax) * 100) / 100;\n  next.amount = next.gross;\n\n  return { json: next };\n});\n"
+      }
+    },
+    {
+      "id": "d28fdddd-5fa3-4768-a5e2-c17800738930",
+      "name": "Score Fraud And Margin",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1580,
+        180
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "\nconst rows = $input.all().map((item) => item.json);\nreturn rows.map((row) => {\n\n  let fraud = 0;\n  if (row.valid_flag && row.billing !== row.ship) fraud += 25;\n  if (row.valid_flag && Number(row.gross) > 2000) fraud += 20;\n  if (row.valid_flag && Number(row.new_customer) === 1) fraud += 15;\n  if (row.valid_flag && row.card && row.card !== row.billing) fraud += 30;\n  if (row.valid_flag && Number(row.velocity_1h) > 3) fraud += 25;\n  fraud = Math.min(99, fraud);\n  const rejectFlag = row.valid_flag && fraud >= 75 ? 1 : 0;\n  const reviewFlag = row.valid_flag && !rejectFlag && (fraud >= 40 || Number(row.margin) < 0.12 || Number(row.gross) > 1500) ? 1 : 0;\n  const fulfill = row.valid_flag && !rejectFlag && !reviewFlag ? 1 : 0;\n  const parcelFlag = fulfill && row.mode === \"parcel\" ? 1 : 0;\n  const pickupFlag = fulfill && row.mode !== \"parcel\" ? 1 : 0;\n  const backorderFlag = parcelFlag && Number(row.qty) > Number(row.stock) ? 1 : 0;\n  let lane = \"pickup\";\n  if (!row.valid_flag) lane = \"quarantine\";\n  else if (rejectFlag) lane = \"reject\";\n  else if (reviewFlag) lane = \"review\";\n  else if (backorderFlag) lane = \"backorder\";\n  else if (parcelFlag) lane = \"parcel\";\n  const actionByLane = {\n    quarantine: \"Send the order back to entry. Do not reserve stock.\",\n    reject: \"Decline the payment and email the customer a plain reason.\",\n    review: \"Hold the order for a person. Do not capture payment yet.\",\n    backorder: \"Take payment, promise the revised ship date, and place a purchase order.\",\n    parcel: \"Capture payment, pick, and hand the parcel to the carrier.\",\n    pickup: \"Capture payment and hold the order at the counter.\"\n  };\n  return { json: { ...row, fraud_score: fraud, reject_flag: rejectFlag, review_flag: reviewFlag, parcel_flag: parcelFlag, pickup_flag: pickupFlag, backorder_flag: backorderFlag, lane, action: actionByLane[lane] } };\n\n});\n"
+      }
+    },
+    {
+      "id": "11441f39-9993-4e79-892c-e2783990dbbe",
+      "name": "Apply SLA Clock",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1900,
+        180
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "\nconst rows = $input.all().map((item) => item.json);\nreturn rows.map((row) => {\n  const next = { ...row };\n\n  const hours = { quarantine: 4, reject: 1, review: 8, backorder: 24, parcel: 12, pickup: 6 };\n  next.sla_hours = hours[next.lane] || 12;\n  next.sla_label = next.sla_hours <= 4 ? \"same-shift\" : next.sla_hours <= 12 ? \"same-day\" : \"next-day\";\n\n  return { json: next };\n});\n"
+      }
+    },
+    {
+      "id": "5450867a-61d6-4b1b-b449-01795ecd45b5",
+      "name": "Executive Digest",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2220,
+        180
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "\nfunction fingerprint(value) {\n  const text = JSON.stringify(value);\n  let hash = 2166136261;\n  for (let i = 0; i < text.length; i++) {\n    hash ^= text.charCodeAt(i);\n    hash = Math.imul(hash, 16777619);\n  }\n  return (hash >>> 0).toString(16).padStart(8, \"0\");\n}\n\nconst rows = $input.all().map((item) => item.json);\nconst lanes = {};\nfor (const row of rows) {\n  if (!lanes[row.lane]) lanes[row.lane] = { count: 0, amount: 0, samples: [] };\n  lanes[row.lane].count += 1;\n  lanes[row.lane].amount = Math.round((lanes[row.lane].amount + Number(row.amount || 0)) * 100) / 100;\n  if (lanes[row.lane].samples.length < 3) {\n    lanes[row.lane].samples.push({ id: row.id, customer: row.customer || \"(blank)\", amount: row.amount, action: row.action, fraud_score: row.fraud_score });\n  }\n}\nconst captured = (lanes.parcel?.amount || 0) + (lanes.pickup?.amount || 0) + (lanes.backorder?.amount || 0);\nreturn [{ json: {\n  project: \"Order Command Center\",\n  generated_at: new Date().toISOString(),\n  records: rows.length,\n  lanes,\n  captured_gross: Math.round(captured * 100) / 100,\n  held_gross: Math.round(((lanes.review?.amount || 0) + (lanes.reject?.amount || 0)) * 100) / 100,\n  fingerprint: fingerprint(rows.map((row) => [row.id, row.lane, row.amount])),\n  headline: rows.length + \" orders scored locally. Captured gross sits on parcel, pickup, and backorder. Review and reject stay uncaptured.\"\n} }];\n"
+      }
+    },
+    {
+      "id": "14533f1c-fb82-4927-8ddb-bc927aa25680",
+      "name": "Valid Order?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1580,
+        520
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "3a823d23-3120-4fc7-812a-3547bed1e89e",
+              "leftValue": "={{ $json.valid_flag }}",
+              "rightValue": 1,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "cccf8144-72ac-460f-8a10-a29a3a771cc9",
+      "name": "Quarantine Desk",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1900,
+        700
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "\nconst rows = $input.all().map((item) => item.json);\nreturn rows.map((row) => {\n  const next = { ...row };\n\n  next.desk = \"quarantine\";\n  next.notice = \"We could not accept order \" + next.id + \" because \" + (next.problems || []).join(\", \") + \".\";\n\n  return { json: next };\n});\n"
+      }
+    },
+    {
+      "id": "7324eee6-df8b-495a-b991-2170cc4d0bf3",
+      "name": "Fraud Reject?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1900,
+        520
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "6dba9788-c830-41a2-82dc-066d3697097c",
+              "leftValue": "={{ $json.reject_flag }}",
+              "rightValue": 1,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "2c85bb3f-54cc-4e82-bf6b-53a391b8d735",
+      "name": "Rejection Desk",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2220,
+        860
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "\nconst rows = $input.all().map((item) => item.json);\nreturn rows.map((row) => {\n  const next = { ...row };\n\n  next.desk = \"rejection\";\n  next.notice = \"Order \" + next.id + \" was declined. Fraud score \" + next.fraud_score + \". No stock was reserved.\";\n\n  return { json: next };\n});\n"
+      }
+    },
+    {
+      "id": "77dac816-600a-4f3d-acaa-678c80d54681",
+      "name": "Needs Human Review?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2220,
+        520
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "a07ecef5-55ef-4031-bcf8-bb9d043d2826",
+              "leftValue": "={{ $json.review_flag }}",
+              "rightValue": 1,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "77bfd0d5-e8d5-484c-927d-ce5110e83856",
+      "name": "Review Desk",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2540,
+        700
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "\nconst rows = $input.all().map((item) => item.json);\nreturn rows.map((row) => {\n  const next = { ...row };\n\n  next.desk = \"review\";\n  next.packet = next.customer + \" / \" + next.tier + \" / fraud \" + next.fraud_score + \" / margin \" + next.margin;\n\n  return { json: next };\n});\n"
+      }
+    },
+    {
+      "id": "b6d76195-20ff-4e97-9120-b76122124f4d",
+      "name": "Parcel Path?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2540,
+        520
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "5d2a7600-7194-41d0-b2f7-103f257e8cc0",
+              "leftValue": "={{ $json.parcel_flag }}",
+              "rightValue": 1,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "d2711b5b-3d5f-4320-9269-c7207c8617b5",
+      "name": "Reserve Inventory",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2860,
+        520
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "\nconst rows = $input.all().map((item) => item.json);\nreturn rows.map((row) => {\n  const next = { ...row };\n\n  next.reserved = Math.min(Number(next.qty), Number(next.stock));\n  next.shortfall = Math.max(0, Number(next.qty) - Number(next.stock));\n\n  return { json: next };\n});\n"
+      }
+    },
+    {
+      "id": "c52f21ac-7b9b-41f7-8688-a14a2eb834e7",
+      "name": "Backorder?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        3180,
+        520
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "b51d81b0-a31e-4f50-8926-57a9e2720dd0",
+              "leftValue": "={{ $json.backorder_flag }}",
+              "rightValue": 1,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "1293cde4-c97b-4c0d-8d6d-f7c362580946",
+      "name": "Backorder Desk",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3500,
+        700
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "\nconst rows = $input.all().map((item) => item.json);\nreturn rows.map((row) => {\n  const next = { ...row };\n\n  next.desk = \"backorder\";\n  next.promise = \"Ship \" + next.reserved + \" now and the remaining \" + next.shortfall + \" when the purchase order lands.\";\n\n  return { json: next };\n});\n"
+      }
+    },
+    {
+      "id": "af6123cc-2061-4a5d-80be-85c0f5cb1ced",
+      "name": "Parcel Rate Shop",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3500,
+        360
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "\nconst rows = $input.all().map((item) => item.json);\nreturn rows.map((row) => {\n  const next = { ...row };\n\n  const pounds = Math.max(1, Number(next.qty));\n  const candidates = [\n    { carrier: \"Road\", price: Math.round((6.5 + pounds * 1.4) * 100) / 100, days: 5 },\n    { carrier: \"Air\", price: Math.round((11 + pounds * 2.6) * 100) / 100, days: 2 }\n  ];\n  candidates.sort((a, b) => a.price - b.price);\n  next.carrier = candidates[0].carrier;\n  next.freight = candidates[0].price;\n  next.transit_days = candidates[0].days;\n\n  return { json: next };\n});\n"
+      }
+    },
+    {
+      "id": "689ee5c9-0fc1-4344-b27e-81e179c05ca7",
+      "name": "Parcel Invoice",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3820,
+        360
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "\nconst rows = $input.all().map((item) => item.json);\nreturn rows.map((row) => {\n\n  const sequence = 8100 + rows.indexOf(row);\n  return { json: { ...row, desk: \"parcel\", invoice_no: \"INV-2026-\" + sequence, amount_due: Math.round((Number(row.gross) + Number(row.freight || 0)) * 100) / 100 } };\n\n});\n"
+      }
+    },
+    {
+      "id": "53a8d94d-dc13-42f0-a606-e507bd7350aa",
+      "name": "Pickup Counter",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2860,
+        900
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "\nconst rows = $input.all().map((item) => item.json);\nreturn rows.map((row) => {\n\n  const sequence = 9100 + rows.indexOf(row);\n  return { json: { ...row, desk: \"pickup\", invoice_no: \"PU-2026-\" + sequence, hold_bin: \"BIN-\" + String(sequence).slice(-3), ready_in_hours: 3 } };\n\n});\n"
+      }
+    }
+  ],
+  "connections": {
+    "Run Order Command": {
+      "main": [
+        [
+          {
+            "node": "Load Order Book",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load Order Book": {
+      "main": [
+        [
+          {
+            "node": "Normalize Orders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Orders": {
+      "main": [
+        [
+          {
+            "node": "Assign Customer Tier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assign Customer Tier": {
+      "main": [
+        [
+          {
+            "node": "Calculate Tax",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Tax": {
+      "main": [
+        [
+          {
+            "node": "Score Fraud And Margin",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Score Fraud And Margin": {
+      "main": [
+        [
+          {
+            "node": "Apply SLA Clock",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Apply SLA Clock": {
+      "main": [
+        [
+          {
+            "node": "Executive Digest",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Valid Order?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Valid Order?": {
+      "main": [
+        [
+          {
+            "node": "Fraud Reject?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Quarantine Desk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fraud Reject?": {
+      "main": [
+        [
+          {
+            "node": "Rejection Desk",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Needs Human Review?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Needs Human Review?": {
+      "main": [
+        [
+          {
+            "node": "Review Desk",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Parcel Path?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parcel Path?": {
+      "main": [
+        [
+          {
+            "node": "Reserve Inventory",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Pickup Counter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reserve Inventory": {
+      "main": [
+        [
+          {
+            "node": "Backorder?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Backorder?": {
+      "main": [
+        [
+          {
+            "node": "Backorder Desk",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Parcel Rate Shop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parcel Rate Shop": {
+      "main": [
+        [
+          {
+            "node": "Parcel Invoice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

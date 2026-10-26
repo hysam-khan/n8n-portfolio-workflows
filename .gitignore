@@ -4,3 +4,6 @@
 *.sqlite-shm
 *.sqlite-wal
 .n8n/
+runs/*.execution.json
+runs/*.import.log
+runs/*.err.log
